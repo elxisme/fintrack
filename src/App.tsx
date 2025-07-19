@@ -22,7 +22,7 @@ function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showCreateTransaction, setShowCreateTransaction] = useState(false);
-  const { user, loading, initialize } = useAuthStore();
+  const { user, loading, initialize, isAdmin } = useAuthStore();
   const { updateSyncStatus } = useFinanceStore();
   const { toasts, addToast, removeToast } = useToast();
   const { isDark } = useTheme();
@@ -138,7 +138,8 @@ function App() {
           onTabChange={(tab) => {
             setActiveTab(tab);
             setSidebarOpen(false);
-          }} 
+          }}
+          isAdmin={isAdmin}
         />
       </div>
 
@@ -156,7 +157,7 @@ function App() {
           {/* Version Footer - Positioned at the end of content */}
           <div className="px-4 sm:px-6 py-3 mb-16 lg:mb-0">
             <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-              FinTrack ver. 1.1.2 by{' '}
+              ChurchTrack ver. 1.2.0 by{' '}
               <a 
                 href="https://elxis.com.ng" 
                 target="_blank" 
@@ -175,10 +176,11 @@ function App() {
         activeTab={activeTab}
         onTabChange={setActiveTab}
         onAddTransaction={() => setShowCreateTransaction(true)}
+        isAdmin={isAdmin}
       />
 
       {/* Create Transaction Modal */}
-      {showCreateTransaction && (
+      {showCreateTransaction && isAdmin && (
         <CreateTransactionModal
           onClose={() => setShowCreateTransaction(false)}
           onSuccess={handleTransactionCreated}

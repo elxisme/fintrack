@@ -19,6 +19,7 @@ interface SettingsProps {
 export default function Settings({ addToast }: SettingsProps) {
   const { user } = useAuthStore();
   const { categories, loadData, updateCategory, deleteCategory, exchangeRate, setExchangeRate } = useFinanceStore();
+  const { isAdmin } = useAuthStore();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -240,6 +241,20 @@ export default function Settings({ addToast }: SettingsProps) {
     );
   }
 
+  if (!isAdmin) {
+    return (
+      <div className="p-4 sm:p-6 bg-gray-50 dark:bg-gray-950 min-h-screen transition-colors duration-200">
+        <div className="text-center py-12">
+          <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+            <User className="w-8 h-8 text-gray-400 dark:text-gray-500" />
+          </div>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Access Restricted</h3>
+          <p className="text-gray-500 dark:text-gray-400">Only administrators can access settings</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-4 sm:p-6 max-w-4xl mx-auto space-y-6 sm:space-y-8 bg-gray-50 dark:bg-gray-950 min-h-screen transition-colors duration-200">
       {/* Profile Settings */}
@@ -250,7 +265,7 @@ export default function Settings({ addToast }: SettingsProps) {
           </div>
           <div>
             <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">Profile Settings</h2>
-            <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">Manage your personal information</p>
+            <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">Manage administrator information</p>
           </div>
         </div>
 

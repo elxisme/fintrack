@@ -6,15 +6,16 @@ interface MobileFooterProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
   onAddTransaction: () => void;
+  isAdmin: boolean;
 }
 
-export default function MobileFooter({ activeTab, onTabChange, onAddTransaction }: MobileFooterProps) {
+export default function MobileFooter({ activeTab, onTabChange, onAddTransaction, isAdmin }: MobileFooterProps) {
   const { signOut } = useAuthStore();
 
   const navItems = [
     { id: 'dashboard', icon: Home, label: 'Home' },
     { id: 'accounts', icon: CreditCard, label: 'Accounts' },
-    { id: 'add', icon: Plus, label: 'Add', isSpecial: true },
+    ...(isAdmin ? [{ id: 'add', icon: Plus, label: 'Add', isSpecial: true }] : []),
     { id: 'transactions', icon: TrendingUp, label: 'History' },
     { id: 'logout', icon: LogOut, label: 'Logout', isLogout: true }
   ];

@@ -36,8 +36,8 @@ export default function AuthForm() {
       <div className="max-w-md w-full">
         {/* Logo */}
         <div className="text-center mb-6 sm:mb-8">
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">FinTrack</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1 sm:mt-2 text-xs sm:text-sm md:text-base">Manage your finances offline and online</p>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">ChurchTrack</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-1 sm:mt-2 text-xs sm:text-sm md:text-base">Church financial management system</p>
         </div>
 
         {/* Auth Form */}
@@ -149,7 +149,7 @@ export default function AuthForm() {
           {/* Version Footer */}
           <div className="text-center mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-gray-200 dark:border-gray-700">
             <p className="text-xs text-gray-500 dark:text-gray-400">
-              FinTrack ver. 1.1.2 by{' '}
+              ChurchTrack ver. 1.2.0 by{' '}
               <a 
                 href="https://elxis.com.ng" 
                 target="_blank" 

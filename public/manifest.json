@@ -1,7 +1,7 @@
 {
-  "name": "FinTrack - Personal Finance Tracker",
-  "short_name": "FinTrack",
-  "description": "Manage your finances offline and online with FinTrack - Track expenses, manage accounts, and stay on top of your financial goals",
+  "name": "ChurchTrack - Church Financial Management",
+  "short_name": "ChurchTrack",
+  "description": "Church financial management system - Track church finances offline and online with role-based access control",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#1e293b",

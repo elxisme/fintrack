@@ -5,16 +5,17 @@ import { useAuthStore } from '../../store/auth-store';
 interface SidebarProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
+  isAdmin: boolean;
 }
 
-export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
+export default function Sidebar({ activeTab, onTabChange, isAdmin }: SidebarProps) {
   const { signOut } = useAuthStore();
 
   const navigation = [
     { id: 'dashboard', name: 'Dashboard', icon: Home },
     { id: 'accounts', name: 'Accounts', icon: CreditCard },
     { id: 'transactions', name: 'Transactions', icon: TrendingUp },
-    { id: 'settings', name: 'Settings', icon: Settings },
+    ...(isAdmin ? [{ id: 'settings', name: 'Settings', icon: Settings }] : []),
   ];
 
   return (
@@ -24,7 +25,7 @@ export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
         <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 dark:from-blue-500 dark:to-blue-600 rounded-lg flex items-center justify-center shadow-sm">
           <DollarSign className="w-5 h-5 text-white" />
         </div>
-        <span className="font-bold text-lg sm:text-xl text-gray-900 dark:text-white">FinTrack</span>
+        <span className="font-bold text-lg sm:text-xl text-gray-900 dark:text-white">ChurchTrack</span>
       </div>
 
       {/* Navigation */}
@@ -58,7 +59,7 @@ export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
       {/* Version Info */}
       <div className="px-3 sm:px-4 py-2 border-t border-gray-200 dark:border-gray-700">
         <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-          FinTrack ver. 1.1.2 by{' '}
+          ChurchTrack ver. 1.2.0 by{' '}
           <a 
             href="https://elxis.com.ng" 
             target="_blank" 
@@ -68,6 +69,11 @@ export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
             eLxis
           </a>
         </p>
+        {isAdmin && (
+          <p className="text-xs text-blue-600 dark:text-blue-400 text-center mt-1 font-medium">
+            Administrator Access
+          </p>
+        )}
       </div>
 
       {/* Sign Out */}

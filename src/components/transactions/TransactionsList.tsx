@@ -6,6 +6,7 @@ import CreateTransactionModal from './CreateTransactionModal';
 import EditTransactionModal from './EditTransactionModal';
 import ConfirmDialog from '../ui/ConfirmDialog';
 import { Transaction } from '../../lib/offline-storage';
+import { useAuthStore } from '../../store/auth-store';
 
 interface TransactionsListProps {
   addToast: (toast: { type: 'success' | 'error' | 'warning' | 'info'; title: string; message?: string }) => void;
@@ -23,6 +24,7 @@ function TransactionsList({ addToast }: TransactionsListProps) {
   const [visibleTransactionsCount, setVisibleTransactionsCount] = useState(TRANSACTIONS_INCREMENT);
   
   const { transactions, accounts, categories, deleteTransaction, exchangeRate } = useFinanceStore();
+  const { isAdmin } = useAuthStore();
 
   const filteredTransactions = transactions
     .filter(transaction => {
@@ -152,15 +154,19 @@ function TransactionsList({ addToast }: TransactionsListProps) {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
         <div>
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Transactions</h2>
-          <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">Track your income, expenses, and transfers</p>
+          <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">
+            {isAdmin ? 'Track church income, expenses, and transfers' : 'View church income, expenses, and transfers'}
+          </p>
         </div>
-        <button
-          onClick={() => setShowCreateModal(true)}
-          className="bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-500 dark:to-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:from-blue-700 hover:to-blue-800 dark:hover:from-blue-600 dark:hover:to-blue-700 transition-all duration-200 flex items-center justify-center gap-2 text-sm sm:text-base shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95"
-        >
-          <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
-          Add Transaction
-        </button>
+        {isAdmin && (
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className="bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-500 dark:to-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:from-blue-700 hover:to-blue-800 dark:hover:from-blue-600 dark:hover:to-blue-700 transition-all duration-200 flex items-center justify-center gap-2 text-sm sm:text-base shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95"
+          >
+            <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
+            Add Transaction
+          </button>
+        )}
       </div>
 
       {/* Filters */}
@@ -317,45 +323,47 @@ function TransactionsList({ addToast }: TransactionsListProps) {
                       )}
 
                       {/* Actions Dropdown */}
-                      <div className="relative">
-                        <button
-                          onClick={() => toggleDropdown(transaction.id)}
-                          className="p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
-                        >
-                          <MoreVertical className="w-4 h-4" />
-                        </button>
+                      {isAdmin && (
+                        <div className="relative">
+                          <button
+                            onClick={() => toggleDropdown(transaction.id)}
+                            className="p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                          >
+                            <MoreVertical className="w-4 h-4" />
+                          </button>
 
-                        {activeDropdown === transaction.id && (
-                          <>
-                            <div 
-                              className="fixed inset-0 z-10" 
-                              onClick={() => setActiveDropdown(null)}
-                            />
-                            <div className="absolute right-0 top-full mt-1 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-20">
-                              <button
-                                onClick={() => {
-                                  setEditingTransaction(transaction);
-                                  setActiveDropdown(null);
-                                }}
-                                className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2"
-                              >
-                                <Edit2 className="w-4 h-4" />
-                                Edit Transaction
-                              </button>
-                              <button
-                                onClick={() => {
-                                  setDeletingTransaction(transaction);
-                                  setActiveDropdown(null);
-                                }}
-                                className="w-full px-4 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                                Delete Transaction
-                              </button>
-                            </div>
-                          </>
-                        )}
-                      </div>
+                          {activeDropdown === transaction.id && (
+                            <>
+                              <div 
+                                className="fixed inset-0 z-10" 
+                                onClick={() => setActiveDropdown(null)}
+                              />
+                              <div className="absolute right-0 top-full mt-1 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-20">
+                                <button
+                                  onClick={() => {
+                                    setEditingTransaction(transaction);
+                                    setActiveDropdown(null);
+                                  }}
+                                  className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2"
+                                >
+                                  <Edit2 className="w-4 h-4" />
+                                  Edit Transaction
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    setDeletingTransaction(transaction);
+                                    setActiveDropdown(null);
+                                  }}
+                                  className="w-full px-4 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                  Delete Transaction
+                                </button>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -389,22 +397,24 @@ function TransactionsList({ addToast }: TransactionsListProps) {
           </h3>
           <p className="text-gray-500 dark:text-gray-400 mb-6 text-sm sm:text-base">
             {filter === 'all' && categoryFilter === 'all'
-              ? 'Start by recording your first transaction'
+              ? (isAdmin ? 'Start by recording your first transaction' : 'No transactions have been recorded yet')
               : 'Try adjusting your filters or create a new transaction'
             }
           </p>
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-500 dark:to-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:from-blue-700 hover:to-blue-800 dark:hover:from-blue-600 dark:hover:to-blue-700 transition-all duration-200 inline-flex items-center gap-2 text-sm sm:text-base shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95"
-          >
-            <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
-            Add Transaction
-          </button>
+          {isAdmin && (
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-500 dark:to-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:from-blue-700 hover:to-blue-800 dark:hover:from-blue-600 dark:hover:to-blue-700 transition-all duration-200 inline-flex items-center gap-2 text-sm sm:text-base shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95"
+            >
+              <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
+              Add Transaction
+            </button>
+          )}
         </div>
       )}
 
       {/* Create Transaction Modal */}
-      {showCreateModal && (
+      {showCreateModal && isAdmin && (
         <CreateTransactionModal
           onClose={() => setShowCreateModal(false)}
           onSuccess={handleTransactionCreated}
@@ -412,7 +422,7 @@ function TransactionsList({ addToast }: TransactionsListProps) {
       )}
 
       {/* Edit Transaction Modal */}
-      {editingTransaction && (
+      {editingTransaction && isAdmin && (
         <EditTransactionModal
           transaction={editingTransaction}
           onClose={() => setEditingTransaction(null)}
