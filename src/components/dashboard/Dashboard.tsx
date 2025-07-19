@@ -19,7 +19,8 @@ interface UserProfile {
 type TimeRange = 'thisMonth' | 'last3Months' | 'thisYear' | 'allTime';
 
 export default function Dashboard({ addToast }: DashboardProps) {
-  const { user } = useAuthStore();
+  const authStore = useAuthStore();
+  const { user } = authStore;
   const { accounts, transactions, categories, loadData, isOnline, syncInProgress, exchangeRate } = useFinanceStore();
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [manualSyncLoading, setManualSyncLoading] = useState(false);

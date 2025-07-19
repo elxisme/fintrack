@@ -17,7 +17,8 @@ export default function AccountsList({ addToast }: AccountsListProps) {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   
   const { accounts, deleteAccount } = useFinanceStore();
-  const { isAdmin } = useAuthStore();
+  const authStore = useAuthStore();
+  const isAdmin = authStore?.isAdmin ?? false;
 
   const getAccountIcon = (type: string) => {
     switch (type) {

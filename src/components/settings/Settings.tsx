@@ -17,9 +17,10 @@ interface SettingsProps {
 }
 
 export default function Settings({ addToast }: SettingsProps) {
-  const { user } = useAuthStore();
+  const authStore = useAuthStore();
+  const { user } = authStore;
+  const isAdmin = authStore?.isAdmin ?? false;
   const { categories, loadData, updateCategory, deleteCategory, exchangeRate, setExchangeRate } = useFinanceStore();
-  const { isAdmin } = useAuthStore();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);

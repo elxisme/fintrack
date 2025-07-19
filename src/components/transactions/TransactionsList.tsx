@@ -24,7 +24,8 @@ function TransactionsList({ addToast }: TransactionsListProps) {
   const [visibleTransactionsCount, setVisibleTransactionsCount] = useState(TRANSACTIONS_INCREMENT);
   
   const { transactions, accounts, categories, deleteTransaction, exchangeRate } = useFinanceStore();
-  const { isAdmin } = useAuthStore();
+  const authStore = useAuthStore();
+  const isAdmin = authStore?.isAdmin ?? false;
 
   const filteredTransactions = transactions
     .filter(transaction => {

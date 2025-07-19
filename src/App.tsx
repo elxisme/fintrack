@@ -22,7 +22,9 @@ function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showCreateTransaction, setShowCreateTransaction] = useState(false);
-  const { user, loading, initialize, isAdmin } = useAuthStore();
+  const authStore = useAuthStore();
+  const { user, loading, initialize } = authStore;
+  const isAdmin = authStore?.isAdmin ?? false;
   const { updateSyncStatus } = useFinanceStore();
   const { toasts, addToast, removeToast } = useToast();
   const { isDark } = useTheme();
