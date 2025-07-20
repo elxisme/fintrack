@@ -25,7 +25,7 @@ export default function Sidebar({ activeTab, onTabChange, isAdmin }: SidebarProp
         <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 dark:from-blue-500 dark:to-blue-600 rounded-lg flex items-center justify-center shadow-sm">
           <DollarSign className="w-5 h-5 text-white" />
         </div>
-        <span className="font-bold text-lg sm:text-xl text-gray-900 dark:text-white">ChurchAccount</span>
+        <span className="font-bold text-lg sm:text-xl text-gray-900 dark:text-white">ChurchTrack</span>
       </div>
 
       {/* Navigation */}
