@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { TrendingUp, TrendingDown, DollarSign, CreditCard, RefreshCw, Wallet, PiggyBank, Target, Calendar, Filter } from 'lucide-react';
+import { TrendingUp, TrendingDown, CreditCard, RefreshCw, Wallet, PiggyBank, Target, Calendar, Filter } from 'lucide-react';
 import { useFinanceStore } from '../../store/finance-store';
 import { useAuthStore } from '../../store/auth-store';
 import { supabase } from '../../lib/supabase';
@@ -13,7 +13,6 @@ interface DashboardProps {
 
 interface UserProfile {
   full_name: string | null;
-  currency: string;
 }
 
 type TimeRange = 'thisMonth' | 'last3Months' | 'thisYear' | 'allTime';
@@ -21,7 +20,7 @@ type TimeRange = 'thisMonth' | 'last3Months' | 'thisYear' | 'allTime';
 export default function Dashboard({ addToast }: DashboardProps) {
   const authStore = useAuthStore();
   const { user } = authStore;
-  const { accounts, transactions, categories, loadData, isOnline, syncInProgress, exchangeRate } = useFinanceStore();
+  const { accounts, transactions, categories, loadData, isOnline, syncInProgress } = useFinanceStore();
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [manualSyncLoading, setManualSyncLoading] = useState(false);
   const [selectedTimeRange, setSelectedTimeRange] = useState<TimeRange>('thisMonth');
@@ -40,7 +39,7 @@ export default function Dashboard({ addToast }: DashboardProps) {
     try {
       const { data, error } = await supabase
         .from('user_profiles')
-        .select('full_name, currency')
+        .select('full_name')
         .eq('id', user.id)
         .single();
 
@@ -202,24 +201,7 @@ export default function Dashboard({ addToast }: DashboardProps) {
   ];
 
   const formatCurrency = (amount: number) => {
-    const currency = userProfile?.currency || 'NGN';
-    
-    if (currency === 'USD' && exchangeRate) {
-      // Convert from NGN to USD using the exchange rate
-      const usdAmount = amount / exchangeRate;
-      return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD'
-      }).format(usdAmount);
-    } else if (currency === 'NGN') {
-      return `₦${new Intl.NumberFormat('en-NG').format(amount)}`;
-    } else {
-      // Fallback to USD formatting without conversion
-      return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD'
-      }).format(amount);
-    }
+    return `₦${new Intl.NumberFormat('en-NG').format(amount)}`;
   };
 
   const getWelcomeMessage = () => {
