@@ -5,6 +5,8 @@ import CreateAccountModal from './CreateAccountModal';
 import EditAccountModal from './EditAccountModal';
 import ConfirmDialog from '../ui/ConfirmDialog';
 import { Account } from '../../lib/offline-storage';
+import { useAuthStore } from '../../store/auth-store';
+
 
 interface AccountsListProps {
   addToast: (toast: { type: 'success' | 'error' | 'warning' | 'info'; title: string; message?: string }) => void;
