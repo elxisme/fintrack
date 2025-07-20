@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, Palette, Plus, Edit2, Trash2, Save, X, DollarSign } from 'lucide-react';
+import { User, Palette, Plus, Edit2, Trash2, Save, X } from 'lucide-react';
 import { useAuthStore } from '../../store/auth-store';
 import { useFinanceStore } from '../../store/finance-store';
 import { supabase } from '../../lib/supabase';
@@ -20,7 +20,7 @@ export default function Settings({ addToast }: SettingsProps) {
   const authStore = useAuthStore();
   const { user } = authStore;
   const isAdmin = authStore?.isAdmin ?? false;
-  const { categories, loadData, updateCategory, deleteCategory, exchangeRate, setExchangeRate } = useFinanceStore();
+  const { categories, loadData, updateCategory, deleteCategory } = useFinanceStore();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -28,13 +28,10 @@ export default function Settings({ addToast }: SettingsProps) {
   const [editingCategory, setEditingCategory] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
   const [editColor, setEditColor] = useState('');
-  const [showExchangeRateModal, setShowExchangeRateModal] = useState(false);
-  const [localExchangeRateInput, setLocalExchangeRateInput] = useState('');
-  const [pendingCurrency, setPendingCurrency] = useState('');
 
   // Form states
   const [fullName, setFullName] = useState('');
-  const [currency, setCurrency] = useState('NGN'); // Default to Naira
+  const currency = 'NGN'; // Hardcoded to Naira
 
   useEffect(() => {
     if (user) {
@@ -64,7 +61,6 @@ export default function Settings({ addToast }: SettingsProps) {
 
       setProfile(data);
       setFullName(data.full_name || '');
-      setCurrency(data.currency || 'NGN'); // Default to Naira if not set
     } catch (error) {
       console.error('Error loading profile:', error);
       addToast({
@@ -76,43 +72,6 @@ export default function Settings({ addToast }: SettingsProps) {
     }
   };
 
-  const handleCurrencyChange = (newCurrency: string) => {
-    if (newCurrency === 'USD' && currency === 'NGN') {
-      // Show exchange rate modal when switching from NGN to USD
-      setPendingCurrency(newCurrency);
-      setShowExchangeRateModal(true);
-      setLocalExchangeRateInput(exchangeRate?.toString() || '');
-    } else if (newCurrency === 'NGN' && currency === 'USD') {
-      // Clear exchange rate when switching back to NGN
-      setExchangeRate(null);
-      setCurrency(newCurrency);
-    } else {
-      setCurrency(newCurrency);
-    }
-  };
-
-  const handleExchangeRateSubmit = () => {
-    const rate = parseFloat(localExchangeRateInput);
-    if (!rate || rate <= 0) {
-      addToast({
-        type: 'error',
-        title: 'Invalid exchange rate'
-      });
-      return;
-    }
-
-    setExchangeRate(rate);
-    setCurrency(pendingCurrency);
-    setShowExchangeRateModal(false);
-    setLocalExchangeRateInput('');
-    setPendingCurrency('');
-    
-    addToast({
-      type: 'success',
-      title: `Exchange rate set to ₦${rate} per $1`
-    });
-  };
-
   const saveProfile = async () => {
     if (!user || !profile) return;
 
@@ -122,7 +81,7 @@ export default function Settings({ addToast }: SettingsProps) {
         .from('user_profiles')
         .update({
           full_name: fullName,
-          currency: currency,
+          currency: 'NGN', // Always save as NGN
           updated_at: new Date().toISOString()
         })
         .eq('id', user.id);
@@ -139,7 +98,7 @@ export default function Settings({ addToast }: SettingsProps) {
       setProfile(prev => prev ? {
         ...prev,
         full_name: fullName,
-        currency: currency
+        currency: 'NGN'
       } : null);
 
       addToast({
@@ -226,11 +185,6 @@ export default function Settings({ addToast }: SettingsProps) {
   const incomeCategories = categories.filter(cat => cat.type === 'income');
   const expenseCategories = categories.filter(cat => cat.type === 'expense');
 
-  const currencies = [
-    { code: 'NGN', name: 'Nigerian Naira (₦)', symbol: '₦' },
-    { code: 'USD', name: 'US Dollar ($)', symbol: '$' }
-  ];
-
   if (loading) {
     return (
       <div className="p-4 sm:p-6 bg-gray-50 dark:bg-gray-950 min-h-screen transition-colors duration-200">
@@ -289,23 +243,11 @@ export default function Settings({ addToast }: SettingsProps) {
             <label htmlFor="currency" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Default Currency
             </label>
-            <select
-              id="currency"
-              value={currency}
-              onChange={(e) => handleCurrencyChange(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base transition-colors duration-200"
-            >
-              {currencies.map((curr) => (
-                <option key={curr.code} value={curr.code}>
-                  {curr.name}
-                </option>
-              ))}
-            </select>
+            <div className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg text-sm sm:text-base">
+              Nigerian Naira (₦)
+            </div>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              {currency === 'USD' ? 'Amounts will be displayed in US Dollars' : 'Amounts will be displayed in Nigerian Naira'}
-              {currency === 'USD' && exchangeRate && (
-                <span className="block mt-1">Exchange rate: ₦{exchangeRate} per $1</span>
-              )}
+              Amounts will be displayed in Nigerian Naira
             </p>
           </div>
         </div>
@@ -508,82 +450,6 @@ export default function Settings({ addToast }: SettingsProps) {
           onClose={() => setShowCreateModal(false)}
           onSuccess={handleCategoryCreated}
         />
-      )}
-
-      {/* Exchange Rate Modal */}
-      {showExchangeRateModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white dark:bg-gray-900 rounded-2xl max-w-md w-full border border-gray-200 dark:border-gray-700">
-            {/* Header */}
-            <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
-                  <DollarSign className="w-5 h-5 text-green-600 dark:text-green-400" />
-                </div>
-                <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">Set Exchange Rate</h2>
-              </div>
-              <button
-                onClick={() => {
-                  setShowExchangeRateModal(false);
-                  setPendingCurrency('');
-                  setLocalExchangeRateInput('');
-                }}
-                className="w-8 h-8 flex items-center justify-center text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Content */}
-            <div className="p-4 sm:p-6">
-              <p className="text-gray-700 dark:text-gray-300 text-sm sm:text-base mb-4">
-                Please enter the current exchange rate from Naira to USD to help with currency conversion.
-              </p>
-
-              <div className="mb-6">
-                <label htmlFor="exchangeRate" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Exchange Rate (₦ per $1)
-                </label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400">₦</span>
-                  <input
-                    id="exchangeRate"
-                    type="number"
-                    step="0.01"
-                    value={localExchangeRateInput}
-                    onChange={(e) => setLocalExchangeRateInput(e.target.value)}
-                    placeholder="1500.00"
-                    className="w-full pl-8 pr-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm sm:text-base transition-colors duration-200"
-                  />
-                </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  Example: If $1 = ₦1,500, enter 1500
-                </p>
-              </div>
-
-              {/* Actions */}
-              <div className="flex flex-col sm:flex-row gap-3">
-                <button
-                  onClick={() => {
-                    setShowExchangeRateModal(false);
-                    setPendingCurrency('');
-                    setLocalExchangeRateInput('');
-                  }}
-                  className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm sm:text-base"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleExchangeRateSubmit}
-                  disabled={!localExchangeRateInput || parseFloat(localExchangeRateInput) <= 0}
-                  className="flex-1 px-4 py-3 bg-gradient-to-r from-green-600 to-green-700 dark:from-green-500 dark:to-green-600 text-white rounded-lg font-medium hover:from-green-700 hover:to-green-800 dark:hover:from-green-600 dark:hover:to-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 text-sm sm:text-base"
-                >
-                  Set Rate & Continue
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
       )}
     </div>
   );
