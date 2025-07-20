@@ -203,7 +203,7 @@ const Dashboard = ({ addToast }: DashboardProps) => {
   const getWelcomeMessage = () => {
     const firstName = userProfile?.full_name?.split(' ')[0];
     if (firstName) {
-      return `Welcome back, ${firstName}!`;
+      return `Hi, ${firstName}!`;
     }
     return 'Welcome to ChurchTrack!';
   };
