@@ -59,7 +59,7 @@ export default function Sidebar({ activeTab, onTabChange, isAdmin }: SidebarProp
       {/* Version Info */}
       <div className="px-3 sm:px-4 py-2 border-t border-gray-200 dark:border-gray-700">
         <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-          ChurchTrack ver. 1.2.0 by{' '}
+          CoCK ver. 1.2.0 by{' '}
           <a 
             href="https://elxis.com.ng" 
             target="_blank" 
