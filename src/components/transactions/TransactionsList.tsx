@@ -1,18 +1,22 @@
 import React, { useState } from 'react';
-import { Plus, ArrowUpRight, ArrowDownRight, ArrowRightLeft, Filter, Edit2, Trash2, MoreVertical, ChevronDown, Tag } from 'lucide-react';
+import { Plus, ArrowUpRight, ArrowDownRight, ArrowRightLeft, Filter, Edit2, Trash2, MoreVertical, ChevronDown, Tag, Download, FileText, Calendar } from 'lucide-react';
 import { useFinanceStore } from '../../store/finance-store';
-import { format } from 'date-fns';
+import { format, startOfMonth, endOfMonth, subMonths } from 'date-fns';
 import CreateTransactionModal from './CreateTransactionModal';
 import EditTransactionModal from './EditTransactionModal';
 import ConfirmDialog from '../ui/ConfirmDialog';
+import StatementOfAccountPrint from './StatementOfAccountPrint';
 import { Transaction } from '../../lib/offline-storage';
 import { useAuthStore } from '../../store/auth-store';
+import { exportStatementToExcel } from '../../utils/excelExport';
 
 interface TransactionsListProps {
   addToast: (toast: { type: 'success' | 'error' | 'warning' | 'info'; title: string; message?: string }) => void;
 }
 
 const TRANSACTIONS_INCREMENT = 10;
+
+type DateRangeFilter = 'thisMonth' | 'lastMonth' | 'custom';
 
 function TransactionsList({ addToast }: TransactionsListProps) {
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -22,13 +26,56 @@ function TransactionsList({ addToast }: TransactionsListProps) {
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [visibleTransactionsCount, setVisibleTransactionsCount] = useState(TRANSACTIONS_INCREMENT);
+  const [dateRangeFilter, setDateRangeFilter] = useState<DateRangeFilter>('thisMonth');
+  const [customStartDate, setCustomStartDate] = useState(format(startOfMonth(new Date()), 'yyyy-MM-dd'));
+  const [customEndDate, setCustomEndDate] = useState(format(endOfMonth(new Date()), 'yyyy-MM-dd'));
+  const [showExportOptions, setShowExportOptions] = useState(false);
+  const [showPrintStatement, setShowPrintStatement] = useState(false);
   
   const { transactions, accounts, categories, deleteTransaction, exchangeRate } = useFinanceStore();
   const authStore = useAuthStore();
   const isAdmin = authStore?.isAdmin ?? false;
 
+  // Get date range based on filter
+  const getDateRange = () => {
+    const now = new Date();
+    switch (dateRangeFilter) {
+      case 'thisMonth':
+        return {
+          start: startOfMonth(now),
+          end: endOfMonth(now),
+          label: format(now, 'MMMM yyyy')
+        };
+      case 'lastMonth':
+        const lastMonth = subMonths(now, 1);
+        return {
+          start: startOfMonth(lastMonth),
+          end: endOfMonth(lastMonth),
+          label: format(lastMonth, 'MMMM yyyy')
+        };
+      case 'custom':
+        return {
+          start: new Date(customStartDate),
+          end: new Date(customEndDate),
+          label: `${format(new Date(customStartDate), 'MMM dd, yyyy')} - ${format(new Date(customEndDate), 'MMM dd, yyyy')}`
+        };
+      default:
+        return {
+          start: startOfMonth(now),
+          end: endOfMonth(now),
+          label: format(now, 'MMMM yyyy')
+        };
+    }
+  };
+
+  const dateRange = getDateRange();
+
   const filteredTransactions = transactions
     .filter(transaction => {
+      // Filter by date range
+      const transactionDate = new Date(transaction.date);
+      if (transactionDate < dateRange.start || transactionDate > dateRange.end) return false;
+      
       // Filter by transaction type
       if (filter !== 'all' && transaction.type !== filter) return false;
       
@@ -133,6 +180,27 @@ function TransactionsList({ addToast }: TransactionsListProps) {
     setVisibleTransactionsCount(prev => prev + TRANSACTIONS_INCREMENT);
   };
 
+  const handleExportExcel = () => {
+    exportStatementToExcel({
+      transactions: filteredTransactions,
+      accounts,
+      categories,
+      dateRange,
+      exchangeRate
+    });
+    setShowExportOptions(false);
+    addToast({
+      type: 'success',
+      title: 'Excel file downloaded',
+      message: 'Statement of Account has been exported to Excel'
+    });
+  };
+
+  const handlePrintStatement = () => {
+    setShowPrintStatement(true);
+    setShowExportOptions(false);
+  };
+
   // Get unique categories from transactions for filter
   const availableCategories = categories.filter(cat => 
     transactions.some(t => t.category_id === cat.id)
@@ -168,10 +236,95 @@ function TransactionsList({ addToast }: TransactionsListProps) {
             Add Transaction
           </button>
         )}
+        {isAdmin && (
+          <div className="relative">
+            <button
+              onClick={() => setShowExportOptions(!showExportOptions)}
+              className="bg-gradient-to-r from-green-600 to-green-700 dark:from-green-500 dark:to-green-600 text-white px-4 py-2 rounded-lg font-medium hover:from-green-700 hover:to-green-800 dark:hover:from-green-600 dark:hover:to-green-700 transition-all duration-200 flex items-center justify-center gap-2 text-sm sm:text-base shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95"
+            >
+              <Download className="w-4 h-4 sm:w-5 sm:h-5" />
+              Export
+            </button>
+
+            {showExportOptions && (
+              <>
+                <div 
+                  className="fixed inset-0 z-10" 
+                  onClick={() => setShowExportOptions(false)}
+                />
+                <div className="absolute right-0 top-full mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-20">
+                  <button
+                    onClick={handlePrintStatement}
+                    className="w-full px-4 py-3 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-3"
+                  >
+                    <FileText className="w-4 h-4" />
+                    <div>
+                      <div className="font-medium">Print Statement</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">Open printable version</div>
+                    </div>
+                  </button>
+                  <button
+                    onClick={handleExportExcel}
+                    className="w-full px-4 py-3 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-3"
+                  >
+                    <Download className="w-4 h-4" />
+                    <div>
+                      <div className="font-medium">Download Excel</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">Export as XLSX file</div>
+                    </div>
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Filters */}
       <div className="flex flex-col lg:flex-row lg:items-center gap-4 mb-6">
+        {/* Date Range Filter */}
+        <div className="flex items-center gap-2">
+          <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 dark:text-gray-500" />
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Period:</span>
+          <select
+            value={dateRangeFilter}
+            onChange={(e) => {
+              setDateRangeFilter(e.target.value as DateRangeFilter);
+              setVisibleTransactionsCount(TRANSACTIONS_INCREMENT);
+            }}
+            className="px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm transition-colors duration-200"
+          >
+            <option value="thisMonth">This Month</option>
+            <option value="lastMonth">Last Month</option>
+            <option value="custom">Custom Range</option>
+          </select>
+        </div>
+
+        {/* Custom Date Range Inputs */}
+        {dateRangeFilter === 'custom' && (
+          <div className="flex items-center gap-2">
+            <input
+              type="date"
+              value={customStartDate}
+              onChange={(e) => {
+                setCustomStartDate(e.target.value);
+                setVisibleTransactionsCount(TRANSACTIONS_INCREMENT);
+              }}
+              className="px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm transition-colors duration-200"
+            />
+            <span className="text-gray-500 dark:text-gray-400">to</span>
+            <input
+              type="date"
+              value={customEndDate}
+              onChange={(e) => {
+                setCustomEndDate(e.target.value);
+                setVisibleTransactionsCount(TRANSACTIONS_INCREMENT);
+              }}
+              className="px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm transition-colors duration-200"
+            />
+          </div>
+        )}
+
         {/* Transaction Type Filter */}
         <div className="flex items-center gap-2">
           <Filter className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 dark:text-gray-500" />
@@ -228,7 +381,7 @@ function TransactionsList({ addToast }: TransactionsListProps) {
         {/* Results Count and Total */}
         <div className="flex flex-col sm:flex-row sm:items-center gap-2 lg:ml-auto text-sm text-gray-500 dark:text-gray-400">
           <span>
-            Showing {visibleTransactions.length} of {filteredTransactions.length} transactions
+            Showing {visibleTransactions.length} of {filteredTransactions.length} transactions for {dateRange.label}
           </span>
           {filteredTransactions.length > 0 && (
             <>
@@ -443,6 +596,30 @@ function TransactionsList({ addToast }: TransactionsListProps) {
         onCancel={() => setDeletingTransaction(null)}
       />
     </div>
+      {/* Print Statement Modal */}
+      {showPrintStatement && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl max-w-6xl w-full max-h-[95vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-4 border-b border-gray-200 sticky top-0 bg-white rounded-t-2xl">
+              <h2 className="text-xl font-bold text-gray-900">Statement of Account - {dateRange.label}</h2>
+              <button
+                onClick={() => setShowPrintStatement(false)}
+                className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                ×
+              </button>
+            </div>
+            <StatementOfAccountPrint
+              transactions={filteredTransactions}
+              accounts={accounts}
+              categories={categories}
+              dateRange={dateRange}
+              exchangeRate={exchangeRate}
+            />
+          </div>
+        </div>
+      )}
+
   );
 }
 
