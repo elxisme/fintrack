@@ -33,8 +33,11 @@ function App() {
   const pwaHook = usePWA(activeTab);
 
   useEffect(() => {
-    initialize();
-    initDB();
+    const initializeApp = async () => {
+      initialize();
+      await initDB();
+    };
+    initializeApp();
   }, [initialize]);
 
   useEffect(() => {
