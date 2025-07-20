@@ -17,7 +17,7 @@ interface UserProfile {
 
 type TimeRange = 'thisMonth' | 'last3Months' | 'thisYear' | 'allTime';
 
-export default function Dashboard({ addToast }: DashboardProps) {
+const Dashboard = ({ addToast }: DashboardProps) => {
   const authStore = useAuthStore();
   const { user } = authStore;
   const { accounts, transactions, categories, loadData, isOnline, syncInProgress } = useFinanceStore();
@@ -62,7 +62,6 @@ export default function Dashboard({ addToast }: DashboardProps) {
     try {
       await syncService.sync();
       
-      // Reload data after sync
       if (user) {
         await loadData(user.id);
       }
@@ -82,7 +81,6 @@ export default function Dashboard({ addToast }: DashboardProps) {
     }
   };
 
-  // Get date range based on selection
   const getDateRange = () => {
     const now = new Date();
     switch (selectedTimeRange) {
@@ -121,7 +119,6 @@ export default function Dashboard({ addToast }: DashboardProps) {
 
   const dateRange = getDateRange();
 
-  // Filter transactions by date range
   const filteredTransactions = transactions.filter(t => {
     const transactionDate = new Date(t.date);
     return transactionDate >= dateRange.start && transactionDate <= dateRange.end;
@@ -141,7 +138,6 @@ export default function Dashboard({ addToast }: DashboardProps) {
 
   const netIncome = totalIncome - totalExpenses;
 
-  // Prepare pie chart data
   const expenseCategories = categories.filter(cat => cat.type === 'expense');
   const pieChartData = expenseCategories.map(category => {
     const categoryTransactions = filteredTransactions.filter(t => 
@@ -159,7 +155,7 @@ export default function Dashboard({ addToast }: DashboardProps) {
       color: category.color,
       transactionCount: categoryTransactions.length
     };
-  }).filter(item => item.amount > 0); // Only show categories with expenses
+  }).filter(item => item.amount > 0);
 
   const stats = [
     {
@@ -212,7 +208,6 @@ export default function Dashboard({ addToast }: DashboardProps) {
     return 'Welcome to ChurchTrack!';
   };
 
-  // Check if there are any unsynced items
   const hasUnsyncedData = accounts.some(acc => !acc.is_synced) || 
                          transactions.some(trans => trans.sync_status === 'pending');
 
@@ -243,7 +238,6 @@ export default function Dashboard({ addToast }: DashboardProps) {
             </p>
           </div>
           
-          {/* Manual Sync Button */}
           <div className="flex items-center gap-3">
             {hasUnsyncedData && isOnline && (
               <div className="flex items-center gap-2 bg-blue-500/30 px-3 py-1.5 rounded-full">
@@ -453,4 +447,6 @@ export default function Dashboard({ addToast }: DashboardProps) {
       </div>
     </div>
   );
-}
+};
+
+export default Dashboard;
