@@ -584,7 +584,7 @@ function TransactionsList({ addToast }: TransactionsListProps) {
         />
       )}
 
-            {/* Delete Confirmation Dialog */}
+             {/* Delete Confirmation Dialog */}
       <ConfirmDialog
         isOpen={!!deletingTransaction}
         title="Delete Transaction"
@@ -619,7 +619,7 @@ function TransactionsList({ addToast }: TransactionsListProps) {
           </div>
         </div>
       )}
-    </div> {/* This is the missing closing div */}
+    </div>
   );
 }
 
