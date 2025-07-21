@@ -125,15 +125,27 @@ export default function StatementOfAccountPrint({
           </div>
         </div>
 
-        {/* Total Balance Section */}
-        <div className="mb-8">
-          <h3 className="text-lg font-bold mb-4 bg-blue-100 p-2 border border-gray-400">TOTAL CURRENT BALANCE</h3>
-          <div className="text-center p-4 border-2 bg-blue-100 border-blue-400">
-            <p className="text-2xl font-bold text-blue-900">{formatCurrency(totalBalance)}</p>
+        {/* Summary Section */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+          {/* Total Current Balance */}
+          <div>
+            <div className="bg-blue-100 border-2 border-blue-400 p-6 text-center">
+              <h3 className="text-xl font-bold text-blue-800 mb-2">TOTAL CURRENT BALANCE</h3>
+              <p className="text-2xl font-bold text-blue-900">{formatCurrency(totalBalance)}</p>
+            </div>
+          </div>
+
+          {/* Net Income */}
+          <div>
+            <div className={`text-center p-6 border-2 ${netIncome >= 0 ? 'bg-green-100 border-green-400' : 'bg-red-100 border-red-400'}`}>
+              <h3 className="text-xl font-bold">
+                NET INCOME: {formatCurrency(netIncome)}
+              </h3>
+            </div>
           </div>
         </div>
 
-        {/* Summary Section */}
+        {/* Income and Expense Summaries */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
           {/* Income Summary */}
           <div>
@@ -149,15 +161,6 @@ export default function StatementOfAccountPrint({
               <h3 className="text-xl font-bold text-red-800 mb-2">TOTAL EXPENSES</h3>
               <p className="text-2xl font-bold text-red-900">{formatCurrency(totalExpenses)}</p>
             </div>
-          </div>
-        </div>
-
-        {/* Net Income */}
-        <div className="mb-8">
-          <div className={`text-center p-4 border-2 ${netIncome >= 0 ? 'bg-green-100 border-green-400' : 'bg-red-100 border-red-400'}`}>
-            <h3 className="text-xl font-bold">
-              NET INCOME: {formatCurrency(netIncome)}
-            </h3>
           </div>
         </div>
 
@@ -179,7 +182,7 @@ export default function StatementOfAccountPrint({
               {sortedTransactions.map((transaction) => {
                 const account = accounts.find(acc => acc.id === transaction.account_id);
                 const category = categories.find(cat => cat.id === transaction.category_id);
-                const targetAccount = accounts.find(acc => acc.target_account_id === transaction.target_account_id);
+                const targetAccount = accounts.find(acc => acc.id === transaction.target_account_id);
                 
                 let description = transaction.description || 'Transaction';
                 if (transaction.type === 'transfer') {
