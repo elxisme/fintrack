@@ -33,6 +33,25 @@ export default function StatementOfAccountPrint({
     return `₦${new Intl.NumberFormat('en-NG').format(amount)}`;
   };
 
+  // Calculate opening balances for each account
+  const openingBalances = accounts.map(account => {
+    const transactionsBeforePeriod = transactions.filter(t => 
+      new Date(t.date) < new Date(dateRange.start) && t.account_id === account.id
+    );
+
+    const balance = transactionsBeforePeriod.reduce((sum, t) => {
+      if (t.type === 'income') return sum + t.amount;
+      if (t.type === 'expense') return sum - t.amount;
+      // Handle transfers: if money comes into this account, add; if it leaves, subtract
+      if (t.type === 'transfer') {
+        if (t.account_id === account.id) return sum - t.amount; // Money leaving this account
+        if (t.target_account_id === account.id) return sum + t.amount; // Money entering this account
+      }
+      return sum;
+    }, 0);
+    return { account: account.name, balance };
+  });
+
   // Calculate summaries
   const incomeTransactions = transactions.filter(t => t.type === 'income');
   const expenseTransactions = transactions.filter(t => t.type === 'expense');
@@ -118,6 +137,27 @@ export default function StatementOfAccountPrint({
             <p><strong>Period:</strong> {dateRange.label}</p>
             <p><strong>Generated on:</strong> {format(new Date(), 'MMMM dd, yyyy')}</p>
           </div>
+        </div>
+
+        {/* Opening Balances Section */}
+        <div className="mb-8">
+          <h3 className="text-lg font-bold mb-4 bg-blue-100 p-2 border border-gray-400">OPENING BALANCES</h3>
+          <table className="w-full border-collapse border border-gray-400 text-sm mb-4">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="border border-gray-400 p-2 text-left font-semibold">Account</th>
+                <th className="border border-gray-400 p-2 text-right font-semibold">Balance</th>
+              </tr>
+            </thead>
+            <tbody>
+              {openingBalances.map((item, index) => (
+                <tr key={index}>
+                  <td className="border border-gray-400 p-2">{item.account}</td>
+                  <td className="border border-gray-400 p-2 text-right">{formatCurrency(item.balance)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
 
         {/* Summary Section */}
@@ -214,3 +254,4 @@ export default function StatementOfAccountPrint({
     </>
   );
 }
+
