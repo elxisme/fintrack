@@ -234,7 +234,7 @@ const Dashboard = ({ addToast }: DashboardProps) => {
           <div>
             <h2 className="text-xl sm:text-2xl font-bold mb-2">{getWelcomeMessage()}</h2>
             <p className="text-blue-100 text-sm sm:text-base opacity-90">
-              Here's the church financial overview for {dateRange.label}
+              Church financial overview for {dateRange.label}
             </p>
           </div>
           
