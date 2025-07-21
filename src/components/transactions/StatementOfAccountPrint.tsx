@@ -125,13 +125,12 @@ export default function StatementOfAccountPrint({
           </div>
         </div>
 
-        {/* Summary Section */}
+        {/* Total Balance and Net Income Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-          {/* Total Current Balance */}
+          {/* Total Balance */}
           <div>
             <div className="bg-blue-100 border-2 border-blue-400 p-6 text-center">
-              <h3 className="text-xl font-bold text-blue-800 mb-2">TOTAL BALANCE: {formatCurrency(totalBalance)}</h3>
-              
+              <h3 className="text-xl font-bold text-blue-800 mb-2">TOTAL BAL: {formatCurrency(totalBalance)}</h3>
             </div>
           </div>
 
