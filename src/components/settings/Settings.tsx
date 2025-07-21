@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, Palette, Plus, Edit2, Trash2, Save, X } from 'lucide-react';
+import { User, Palette, Plus, Edit2, Trash2, Save, X, AlertTriangle } from 'lucide-react';
 import { useAuthStore } from '../../store/auth-store';
 import { useFinanceStore } from '../../store/finance-store';
 import { supabase } from '../../lib/supabase';
@@ -16,6 +16,60 @@ interface SettingsProps {
   addToast: (toast: { type: 'success' | 'error' | 'warning' | 'info'; title: string; message?: string }) => void;
 }
 
+// Custom Delete Confirmation Modal Component
+interface DeleteConfirmationModalProps {
+  isOpen: boolean;
+  categoryName: string;
+  onConfirm: () => void;
+  onCancel: () => void;
+}
+
+const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
+  isOpen,
+  categoryName,
+  onConfirm,
+  onCancel
+}) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-6 max-w-md w-full shadow-xl">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center">
+            <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400" />
+          </div>
+          <div>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Delete Category</h3>
+            <p className="text-gray-600 dark:text-gray-400 text-sm">This action cannot be undone</p>
+          </div>
+        </div>
+        
+        <p className="text-gray-700 dark:text-gray-300 mb-6">
+          Are you sure you want to delete the category <span className="font-semibold">"{categoryName}"</span>? 
+          This will remove the category permanently.
+        </p>
+        
+        <div className="flex gap-3 justify-end">
+          <button
+            onClick={onCancel}
+            className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onConfirm}
+            className="px-4 py-2 bg-red-600 dark:bg-red-500 text-white rounded-lg hover:bg-red-700 dark:hover:bg-red-600 transition-colors duration-200 flex items-center gap-2"
+          >
+            <Trash2 className="w-4 h-4" />
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default function Settings({ addToast }: SettingsProps) {
   const authStore = useAuthStore();
   const { user } = authStore;
@@ -28,6 +82,10 @@ export default function Settings({ addToast }: SettingsProps) {
   const [editingCategory, setEditingCategory] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
   const [editColor, setEditColor] = useState('');
+
+  // Delete confirmation modal state
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [categoryToDelete, setCategoryToDelete] = useState<{ id: string; name: string } | null>(null);
 
   // Form states
   const [fullName, setFullName] = useState('');
@@ -149,11 +207,21 @@ export default function Settings({ addToast }: SettingsProps) {
     }
   };
 
-  const handleDeleteCategory = async (categoryId: string) => {
-    if (!confirm('Are you sure you want to delete this category?')) return;
+  // Updated delete function to show custom modal instead of window.confirm
+  const handleDeleteCategory = (categoryId: string) => {
+    const category = categories.find(cat => cat.id === categoryId);
+    if (!category) return;
+
+    setCategoryToDelete({ id: categoryId, name: category.name });
+    setShowDeleteModal(true);
+  };
+
+  // Actual delete function called after confirmation
+  const confirmDeleteCategory = async () => {
+    if (!categoryToDelete) return;
 
     try {
-      await deleteCategory(categoryId);
+      await deleteCategory(categoryToDelete.id);
 
       addToast({
         type: 'success',
@@ -165,7 +233,16 @@ export default function Settings({ addToast }: SettingsProps) {
         type: 'error',
         title: 'Delete failed'
       });
+    } finally {
+      setShowDeleteModal(false);
+      setCategoryToDelete(null);
     }
+  };
+
+  // Cancel delete function
+  const cancelDeleteCategory = () => {
+    setShowDeleteModal(false);
+    setCategoryToDelete(null);
   };
 
   const cancelEdit = () => {
@@ -445,7 +522,14 @@ export default function Settings({ addToast }: SettingsProps) {
           onSuccess={handleCategoryCreated}
         />
       )}
+
+      {/* Custom Delete Confirmation Modal */}
+      <DeleteConfirmationModal
+        isOpen={showDeleteModal}
+        categoryName={categoryToDelete?.name || ''}
+        onConfirm={confirmDeleteCategory}
+        onCancel={cancelDeleteCategory}
+      />
     </div>
   );
 }
-
