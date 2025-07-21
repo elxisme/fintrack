@@ -32,6 +32,12 @@ export function exportStatementToExcel(data: StatementData) {
     return `₦${new Intl.NumberFormat('en-NG').format(amount)}`;
   };
 
+  // Calculate totals
+  const incomeTransactions = transactions.filter(t => t.type === 'income');
+  const expenseTransactions = transactions.filter(t => t.type === 'expense');
+  const totalIncome = incomeTransactions.reduce((sum, t) => sum + t.amount, 0);
+  const totalExpenses = expenseTransactions.reduce((sum, t) => sum + t.amount, 0);
+
   // Prepare header data
   const headerData = [
     ['CHURCH OF CHRIST, KAGINI'],
@@ -44,12 +50,6 @@ export function exportStatementToExcel(data: StatementData) {
     ['TOTAL EXPENSES', formatCurrency(totalExpenses)],
     ['']
   ];
-
-  // Calculate totals
-  const incomeTransactions = transactions.filter(t => t.type === 'income');
-  const expenseTransactions = transactions.filter(t => t.type === 'expense');
-  const totalIncome = incomeTransactions.reduce((sum, t) => sum + t.amount, 0);
-  const totalExpenses = expenseTransactions.reduce((sum, t) => sum + t.amount, 0);
   
   // Add net income
   headerData.push(['NET INCOME', formatCurrency(totalIncome - totalExpenses)]);
