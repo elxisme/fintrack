@@ -13,10 +13,10 @@ export default function Sidebar({ activeTab, onTabChange, isAdmin }: SidebarProp
 
   const navigation = [
     { id: 'dashboard', name: 'Dashboard', icon: Home },
-    ...(isAdmin ? [{ id: 'accounts', name: 'Accounts', icon: CreditCard }] : []),
+    { id: 'accounts', name: 'Accounts', icon: CreditCard, adminOnly: true },
     { id: 'transactions', name: 'Transactions', icon: TrendingUp },
-    ...(isAdmin ? [{ id: 'settings', name: 'Settings', icon: Settings }] : []),
-  ];
+    { id: 'settings', name: 'Settings', icon: Settings }
+  ].filter(item => !item.adminOnly || isAdmin);
 
   return (
     <div className="flex flex-col h-full bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 transition-colors duration-200">

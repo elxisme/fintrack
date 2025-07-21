@@ -253,18 +253,20 @@ export default function Settings({ addToast }: SettingsProps) {
       </div>
 
       {/* Category Management */}
-      {isAdmin && (
-        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-4 sm:p-6 shadow-sm">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center">
-                <Palette className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-              </div>
-              <div>
-                <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">Categories</h2>
-                <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">Manage your transaction categories</p>
-              </div>
+      <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-4 sm:p-6 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center">
+              <Palette className="w-5 h-5 text-purple-600 dark:text-purple-400" />
             </div>
+            <div>
+              <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">Categories</h2>
+              <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">
+                {isAdmin ? 'Manage transaction categories' : 'View transaction categories'}
+              </p>
+            </div>
+          </div>
+          {isAdmin && (
             <button
               onClick={() => setShowCreateModal(true)}
               className="bg-gradient-to-r from-purple-600 to-purple-700 dark:from-purple-500 dark:to-purple-600 text-white px-4 py-2 rounded-lg font-medium hover:from-purple-700 hover:to-purple-800 dark:hover:from-purple-600 dark:hover:to-purple-700 transition-all duration-200 flex items-center justify-center gap-2 text-sm sm:text-base shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95"
@@ -272,7 +274,8 @@ export default function Settings({ addToast }: SettingsProps) {
               <Plus className="w-4 h-4" />
               Add Category
             </button>
-          </div>
+          )}
+        </div>
 
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 sm:gap-8">
             {/* Income Categories */}

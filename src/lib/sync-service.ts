@@ -61,7 +61,7 @@ class SyncService {
       await this.syncFromServer(user.id);
       
       // Then sync TO server (upload local changes)
-      await this.syncToServer();
+      await this.syncToServer(user.id);
       
       this.notifyCallbacks();
     } catch (error) {
@@ -229,7 +229,7 @@ class SyncService {
     }
   }
 
-  private async syncToServer(): Promise<void> {
+  private async syncToServer(userId: string): Promise<void> {
     // Get current user session
     const { data: { user }, error: userError } = await supabase.auth.getUser();
     
@@ -241,6 +241,20 @@ class SyncService {
     if (!user) {
       console.log('No authenticated user found, skipping server sync');
       return;
+    }
+
+    // Get user profile to check admin status
+    let isAdmin = false;
+    try {
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+      
+      isAdmin = profile?.role === 'admin';
+    } catch (error) {
+      console.error('Error checking admin status:', error);
     }
 
     console.log('Syncing to server for user:', user.id);
@@ -276,11 +290,11 @@ class SyncService {
             console.error('Error checking account ownership for transaction:', dbError);
           }
         } else if (item.table === 'categories') {
-          // For categories, check if user_id matches current user
-          if (item.data.user_id === user.id) {
+          // For categories, check if user_id matches current user OR if user is admin
+          if (item.data.user_id === user.id || (isAdmin && item.data.user_id === null)) {
             shouldSync = true;
           } else {
-            console.warn(`Skipping category sync - user_id mismatch. Expected: ${user.id}, Got: ${item.data.user_id}`);
+            console.warn(`Skipping category sync - user_id mismatch or insufficient permissions. Expected: ${user.id}, Got: ${item.data.user_id}, IsAdmin: ${isAdmin}`);
           }
         }
 

@@ -39,65 +39,19 @@ export function exportStatementToExcel(data: StatementData) {
     [`Period: ${dateRange.label}`],
     [`Generated on: ${format(new Date(), 'MMMM dd, yyyy')}`],
     [''],
-    ['INCOME SUMMARY'],
-    ['Description', 'Amount']
+    ['TOTAL INCOME', formatCurrency(totalIncome)],
+    [''],
+    ['TOTAL EXPENSES', formatCurrency(totalExpenses)],
+    ['']
   ];
 
-  // Calculate income summary
+  // Calculate totals
   const incomeTransactions = transactions.filter(t => t.type === 'income');
-  const incomeByCategory = categories
-    .filter(cat => cat.type === 'income')
-    .map(category => {
-      const categoryTransactions = incomeTransactions.filter(t => t.category_id === category.id);
-      const total = categoryTransactions.reduce((sum, t) => sum + t.amount, 0);
-      return [category.name, formatCurrency(total)];
-    })
-    .filter(([, amount]) => amount !== formatCurrency(0));
-
-  // Add uncategorized income if any
-  const uncategorizedIncome = incomeTransactions
-    .filter(t => !t.category_id)
-    .reduce((sum, t) => sum + t.amount, 0);
-  
-  if (uncategorizedIncome > 0) {
-    incomeByCategory.push(['Uncategorized', formatCurrency(uncategorizedIncome)]);
-  }
-
-  const totalIncome = incomeTransactions.reduce((sum, t) => sum + t.amount, 0);
-  incomeByCategory.push(['TOTAL INCOME', formatCurrency(totalIncome)]);
-
-  // Add income data to header
-  headerData.push(...incomeByCategory);
-  headerData.push(['']);
-  headerData.push(['EXPENSE SUMMARY']);
-  headerData.push(['Description', 'Amount']);
-
-  // Calculate expense summary
   const expenseTransactions = transactions.filter(t => t.type === 'expense');
-  const expenseByCategory = categories
-    .filter(cat => cat.type === 'expense')
-    .map(category => {
-      const categoryTransactions = expenseTransactions.filter(t => t.category_id === category.id);
-      const total = categoryTransactions.reduce((sum, t) => sum + t.amount, 0);
-      return [category.name, formatCurrency(total)];
-    })
-    .filter(([, amount]) => amount !== formatCurrency(0));
-
-  // Add uncategorized expenses if any
-  const uncategorizedExpenses = expenseTransactions
-    .filter(t => !t.category_id)
-    .reduce((sum, t) => sum + t.amount, 0);
-  
-  if (uncategorizedExpenses > 0) {
-    expenseByCategory.push(['Uncategorized', formatCurrency(uncategorizedExpenses)]);
-  }
-
+  const totalIncome = incomeTransactions.reduce((sum, t) => sum + t.amount, 0);
   const totalExpenses = expenseTransactions.reduce((sum, t) => sum + t.amount, 0);
-  expenseByCategory.push(['TOTAL EXPENSES', formatCurrency(totalExpenses)]);
-
-  // Add expense data to header
-  headerData.push(...expenseByCategory);
-  headerData.push(['']);
+  
+  // Add net income
   headerData.push(['NET INCOME', formatCurrency(totalIncome - totalExpenses)]);
   headerData.push(['']);
   headerData.push(['DETAILED TRANSACTIONS']);
