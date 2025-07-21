@@ -435,7 +435,6 @@ export default function Settings({ addToast }: SettingsProps) {
             </div>
           </div>
         </div>
-      </div>
 
       {/* Create Category Modal */}
       {showCreateModal && isAdmin && (
