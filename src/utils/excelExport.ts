@@ -37,6 +37,7 @@ export function exportStatementToExcel(data: StatementData) {
   const expenseTransactions = transactions.filter(t => t.type === 'expense');
   const totalIncome = incomeTransactions.reduce((sum, t) => sum + t.amount, 0);
   const totalExpenses = expenseTransactions.reduce((sum, t) => sum + t.amount, 0);
+  const totalBalance = accounts.reduce((sum, account) => sum + account.current_balance, 0);
 
   // Prepare header data
   const headerData = [
@@ -44,6 +45,8 @@ export function exportStatementToExcel(data: StatementData) {
     ['STATEMENT OF ACCOUNT'],
     [`Period: ${dateRange.label}`],
     [`Generated on: ${format(new Date(), 'MMMM dd, yyyy')}`],
+    [''],
+    ['TOTAL CURRENT BALANCE', formatCurrency(totalBalance)],
     [''],
     ['TOTAL INCOME', formatCurrency(totalIncome)],
     [''],
