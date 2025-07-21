@@ -277,161 +277,162 @@ export default function Settings({ addToast }: SettingsProps) {
           )}
         </div>
 
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 sm:gap-8">
-            {/* Income Categories */}
-            <div>
-              <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                Income Categories
-              </h3>
-              <div className="space-y-3">
-                {incomeCategories.map((category) => (
-                  <div
-                    key={category.id}
-                    className="flex items-center justify-between p-3 sm:p-4 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
-                  >
-                    {editingCategory === category.id ? (
-                      <div className="flex items-center gap-2 sm:gap-3 flex-1">
-                        <input
-                          type="color"
-                          value={editColor}
-                          onChange={(e) => setEditColor(e.target.value)}
-                          className="w-6 h-6 sm:w-8 sm:h-8 rounded border border-gray-300 dark:border-gray-600"
-                        />
-                        <input
-                          type="text"
-                          value={editName}
-                          onChange={(e) => setEditName(e.target.value)}
-                          className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base transition-colors duration-200"
-                        />
-                        <div className="flex gap-1 sm:gap-2">
-                          <button
-                            onClick={() => saveCategory(category.id)}
-                            className="p-2 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/20 rounded-lg transition-colors"
-                          >
-                            <Save className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={cancelEdit}
-                            className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
-                          >
-                            <X className="w-4 h-4" />
-                          </button>
-                        </div>
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 sm:gap-8">
+          {/* Income Categories */}
+          <div>
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+              Income Categories
+            </h3>
+            <div className="space-y-3">
+              {incomeCategories.map((category) => (
+                <div
+                  key={category.id}
+                  className="flex items-center justify-between p-3 sm:p-4 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+                >
+                  {editingCategory === category.id ? (
+                    <div className="flex items-center gap-2 sm:gap-3 flex-1">
+                      <input
+                        type="color"
+                        value={editColor}
+                        onChange={(e) => setEditColor(e.target.value)}
+                        className="w-6 h-6 sm:w-8 sm:h-8 rounded border border-gray-300 dark:border-gray-600"
+                      />
+                      <input
+                        type="text"
+                        value={editName}
+                        onChange={(e) => setEditName(e.target.value)}
+                        className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base transition-colors duration-200"
+                      />
+                      <div className="flex gap-1 sm:gap-2">
+                        <button
+                          onClick={() => saveCategory(category.id)}
+                          className="p-2 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/20 rounded-lg transition-colors"
+                        >
+                          <Save className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={cancelEdit}
+                          className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
                       </div>
-                    ) : (
-                      <>
-                        <div className="flex items-center gap-3 min-w-0 flex-1">
-                          <div
-                            className="w-4 h-4 rounded-full flex-shrink-0"
-                            style={{ backgroundColor: category.color }}
-                          ></div>
-                          <span className="font-medium text-gray-900 dark:text-white text-sm sm:text-base truncate">{category.name}</span>
-                          {!category.user_id && (
-                            <span className="text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-2 py-1 rounded-full whitespace-nowrap">
-                              Default
-                            </span>
-                          )}
-                        </div>
-                        {category.user_id && (
-                          <div className="flex gap-1 sm:gap-2 ml-2">
-                            <button
-                              onClick={() => startEditCategory(category)}
-                              className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                            >
-                              <Edit2 className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={() => handleDeleteCategory(category.id)}
-                              className="p-2 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <div
+                          className="w-4 h-4 rounded-full flex-shrink-0"
+                          style={{ backgroundColor: category.color }}
+                        ></div>
+                        <span className="font-medium text-gray-900 dark:text-white text-sm sm:text-base truncate">{category.name}</span>
+                        {!category.user_id && (
+                          <span className="text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-2 py-1 rounded-full whitespace-nowrap">
+                            Default
+                          </span>
                         )}
-                      </>
-                    )}
-                  </div>
-                ))}
-              </div>
+                      </div>
+                      {/* Fixed: Admin can manage all categories, regular users can only manage their own */}
+                      {(isAdmin || category.user_id) && (
+                        <div className="flex gap-1 sm:gap-2 ml-2">
+                          <button
+                            onClick={() => startEditCategory(category)}
+                            className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                          >
+                            <Edit2 className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteCategory(category.id)}
+                            className="p-2 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+              ))}
             </div>
+          </div>
 
-            {/* Expense Categories */}
-            <div>
-              <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                Expense Categories
-              </h3>
-              <div className="space-y-3">
-                {expenseCategories.map((category) => (
-                  <div
-                    key={category.id}
-                    className="flex items-center justify-between p-3 sm:p-4 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
-                  >
-                    {editingCategory === category.id ? (
-                      <div className="flex items-center gap-2 sm:gap-3 flex-1">
-                        <input
-                          type="color"
-                          value={editColor}
-                          onChange={(e) => setEditColor(e.target.value)}
-                          className="w-6 h-6 sm:w-8 sm:h-8 rounded border border-gray-300 dark:border-gray-600"
-                        />
-                        <input
-                          type="text"
-                          value={editName}
-                          onChange={(e) => setEditName(e.target.value)}
-                          className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base transition-colors duration-200"
-                        />
-                        <div className="flex gap-1 sm:gap-2">
-                          <button
-                            onClick={() => saveCategory(category.id)}
-                            className="p-2 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/20 rounded-lg transition-colors"
-                          >
-                            <Save className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={cancelEdit}
-                            className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
-                          >
-                            <X className="w-4 h-4" />
-                          </button>
-                        </div>
+          {/* Expense Categories */}
+          <div>
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+              <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+              Expense Categories
+            </h3>
+            <div className="space-y-3">
+              {expenseCategories.map((category) => (
+                <div
+                  key={category.id}
+                  className="flex items-center justify-between p-3 sm:p-4 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+                >
+                  {editingCategory === category.id ? (
+                    <div className="flex items-center gap-2 sm:gap-3 flex-1">
+                      <input
+                        type="color"
+                        value={editColor}
+                        onChange={(e) => setEditColor(e.target.value)}
+                        className="w-6 h-6 sm:w-8 sm:h-8 rounded border border-gray-300 dark:border-gray-600"
+                      />
+                      <input
+                        type="text"
+                        value={editName}
+                        onChange={(e) => setEditName(e.target.value)}
+                        className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base transition-colors duration-200"
+                      />
+                      <div className="flex gap-1 sm:gap-2">
+                        <button
+                          onClick={() => saveCategory(category.id)}
+                          className="p-2 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/20 rounded-lg transition-colors"
+                        >
+                          <Save className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={cancelEdit}
+                          className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
                       </div>
-                    ) : (
-                      <>
-                        <div className="flex items-center gap-3 min-w-0 flex-1">
-                          <div
-                            className="w-4 h-4 rounded-full flex-shrink-0"
-                            style={{ backgroundColor: category.color }}
-                          ></div>
-                          <span className="font-medium text-gray-900 dark:text-white text-sm sm:text-base truncate">{category.name}</span>
-                          {!category.user_id && (
-                            <span className="text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-2 py-1 rounded-full whitespace-nowrap">
-                              Default
-                            </span>
-                          )}
-                        </div>
-                        {category.user_id && (
-                          <div className="flex gap-1 sm:gap-2 ml-2">
-                            <button
-                              onClick={() => startEditCategory(category)}
-                              className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                            >
-                              <Edit2 className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={() => handleDeleteCategory(category.id)}
-                              className="p-2 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <div
+                          className="w-4 h-4 rounded-full flex-shrink-0"
+                          style={{ backgroundColor: category.color }}
+                        ></div>
+                        <span className="font-medium text-gray-900 dark:text-white text-sm sm:text-base truncate">{category.name}</span>
+                        {!category.user_id && (
+                          <span className="text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-2 py-1 rounded-full whitespace-nowrap">
+                            Default
+                          </span>
                         )}
-                      </>
-                    )}
-                  </div>
-                ))}
-              </div>
+                      </div>
+                      {/* Fixed: Admin can manage all categories, regular users can only manage their own */}
+                      {(isAdmin || category.user_id) && (
+                        <div className="flex gap-1 sm:gap-2 ml-2">
+                          <button
+                            onClick={() => startEditCategory(category)}
+                            className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                          >
+                            <Edit2 className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteCategory(category.id)}
+                            className="p-2 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -447,3 +448,4 @@ export default function Settings({ addToast }: SettingsProps) {
     </div>
   );
 }
+
