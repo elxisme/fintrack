@@ -335,6 +335,26 @@ export default function Settings({ addToast }: SettingsProps) {
                         </div>
                         {category.user_id && (
                           <div className="flex gap-1 sm:gap-2 ml-2">
+                            {isAdmin && (
+                              <>
+                                <button
+                                  onClick={() => startEditCategory(category)}
+                                  className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                                >
+                                  <Edit2 className="w-4 h-4" />
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteCategory(category.id)}
+                                  className="p-2 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        )}
+                        {!category.user_id && isAdmin && (
+                          <div className="flex gap-1 sm:gap-2 ml-2">
                             <button
                               onClick={() => startEditCategory(category)}
                               className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
@@ -413,6 +433,26 @@ export default function Settings({ addToast }: SettingsProps) {
                         </div>
                         {category.user_id && (
                           <div className="flex gap-1 sm:gap-2 ml-2">
+                            {isAdmin && (
+                              <>
+                                <button
+                                  onClick={() => startEditCategory(category)}
+                                  className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                                >
+                                  <Edit2 className="w-4 h-4" />
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteCategory(category.id)}
+                                  className="p-2 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        )}
+                        {!category.user_id && isAdmin && (
+                          <div className="flex gap-1 sm:gap-2 ml-2">
                             <button
                               onClick={() => startEditCategory(category)}
                               className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
@@ -435,7 +475,6 @@ export default function Settings({ addToast }: SettingsProps) {
             </div>
           </div>
         </div>
-      )}
 
       {/* Create Category Modal */}
       {showCreateModal && isAdmin && (
