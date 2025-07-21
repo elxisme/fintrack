@@ -14,7 +14,7 @@ export default function MobileFooter({ activeTab, onTabChange, onAddTransaction,
 
   const navItems = [
     { id: 'dashboard', icon: Home, label: 'Home' },
-    { id: 'accounts', icon: CreditCard, label: 'Accounts' },
+    ...(isAdmin ? [{ id: 'accounts', icon: CreditCard, label: 'Accounts' }] : []),
     ...(isAdmin ? [{ id: 'add', icon: Plus, label: 'Add', isSpecial: true }] : []),
     { id: 'transactions', icon: TrendingUp, label: 'History' },
     { id: 'logout', icon: LogOut, label: 'Logout', isLogout: true }

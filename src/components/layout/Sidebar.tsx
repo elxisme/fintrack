@@ -13,7 +13,7 @@ export default function Sidebar({ activeTab, onTabChange, isAdmin }: SidebarProp
 
   const navigation = [
     { id: 'dashboard', name: 'Dashboard', icon: Home },
-    { id: 'accounts', name: 'Accounts', icon: CreditCard },
+    ...(isAdmin ? [{ id: 'accounts', name: 'Accounts', icon: CreditCard }] : []),
     { id: 'transactions', name: 'Transactions', icon: TrendingUp },
     ...(isAdmin ? [{ id: 'settings', name: 'Settings', icon: Settings }] : []),
   ];
