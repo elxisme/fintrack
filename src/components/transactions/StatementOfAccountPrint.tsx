@@ -130,7 +130,7 @@ export default function StatementOfAccountPrint({
           {/* Total Current Balance */}
           <div>
             <div className="bg-blue-100 border-2 border-blue-400 p-6 text-center">
-              <h3 className="text-xl font-bold text-blue-800 mb-2">TOTAL CURRENT BALANCE</h3>
+              <h3 className="text-xl font-bold text-blue-800 mb-2">TOTAL BALANCE</h3>
               <p className="text-2xl font-bold text-blue-900">{formatCurrency(totalBalance)}</p>
             </div>
           </div>
