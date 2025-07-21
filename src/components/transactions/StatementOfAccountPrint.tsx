@@ -124,18 +124,52 @@ export default function StatementOfAccountPrint({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
           {/* Income Summary */}
           <div>
-            <div className="bg-green-100 border-2 border-green-400 p-6 text-center">
-              <h3 className="text-xl font-bold text-green-800 mb-2">TOTAL INCOME</h3>
-              <p className="text-2xl font-bold text-green-900">{formatCurrency(totalIncome)}</p>
-            </div>
+            <h3 className="text-lg font-bold mb-4 bg-green-100 p-2 border border-gray-400">INCOME SUMMARY</h3>
+            <table className="w-full border-collapse border border-gray-400 text-sm">
+              <thead>
+                <tr className="bg-gray-100">
+                  <th className="border border-gray-400 p-2 text-left font-semibold">Description</th>
+                  <th className="border border-gray-400 p-2 text-right font-semibold">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                {incomeByCategory.map((item, index) => (
+                  <tr key={index}>
+                    <td className="border border-gray-400 p-2">{item.category}</td>
+                    <td className="border border-gray-400 p-2 text-right">{formatCurrency(item.amount)}</td>
+                  </tr>
+                ))}
+                <tr className="bg-green-50 font-bold">
+                  <td className="border border-gray-400 p-2">TOTAL INCOME</td>
+                  <td className="border border-gray-400 p-2 text-right">{formatCurrency(totalIncome)}</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
 
           {/* Expense Summary */}
           <div>
-            <div className="bg-red-100 border-2 border-red-400 p-6 text-center">
-              <h3 className="text-xl font-bold text-red-800 mb-2">TOTAL EXPENSES</h3>
-              <p className="text-2xl font-bold text-red-900">{formatCurrency(totalExpenses)}</p>
-            </div>
+            <h3 className="text-lg font-bold mb-4 bg-red-100 p-2 border border-gray-400">EXPENSE SUMMARY</h3>
+            <table className="w-full border-collapse border border-gray-400 text-sm">
+              <thead>
+                <tr className="bg-gray-100">
+                  <th className="border border-gray-400 p-2 text-left font-semibold">Description</th>
+                  <th className="border border-gray-400 p-2 text-right font-semibold">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                {expenseByCategory.map((item, index) => (
+                  <tr key={index}>
+                    <td className="border border-gray-400 p-2">{item.category}</td>
+                    <td className="border border-gray-400 p-2 text-right">{formatCurrency(item.amount)}</td>
+                  </tr>
+                ))}
+                <tr className="bg-red-50 font-bold">
+                  <td className="border border-gray-400 p-2">TOTAL EXPENSES</td>
+                  <td className="border border-gray-400 p-2 text-right">{formatCurrency(totalExpenses)}</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
 
