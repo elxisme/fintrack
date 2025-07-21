@@ -33,24 +33,10 @@ export default function StatementOfAccountPrint({
     return `₦${new Intl.NumberFormat('en-NG').format(amount)}`;
   };
 
-  // Calculate opening balances for each account
-  const openingBalances = accounts.map(account => {
-    const transactionsBeforePeriod = transactions.filter(t => 
-      new Date(t.date) < new Date(dateRange.start) && t.account_id === account.id
-    );
-
-    const balance = transactionsBeforePeriod.reduce((sum, t) => {
-      if (t.type === 'income') return sum + t.amount;
-      if (t.type === 'expense') return sum - t.amount;
-      // Handle transfers: if money comes into this account, add; if it leaves, subtract
-      if (t.type === 'transfer') {
-        if (t.account_id === account.id) return sum - t.amount; // Money leaving this account
-        if (t.target_account_id === account.id) return sum + t.amount; // Money entering this account
-      }
-      return sum;
-    }, 0);
-    return { account: account.name, balance };
-  });
+  // Calculate total balance from all accounts
+  const totalBalance = accounts.reduce((sum, account) => {
+    return sum + account.current_balance;
+  }, 0);
 
   // Calculate summaries
   const incomeTransactions = transactions.filter(t => t.type === 'income');
@@ -139,25 +125,12 @@ export default function StatementOfAccountPrint({
           </div>
         </div>
 
-        {/* Opening Balances Section */}
+        {/* Total Balance Section */}
         <div className="mb-8">
-          <h3 className="text-lg font-bold mb-4 bg-blue-100 p-2 border border-gray-400">OPENING BALANCES</h3>
-          <table className="w-full border-collapse border border-gray-400 text-sm mb-4">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="border border-gray-400 p-2 text-left font-semibold">Account</th>
-                <th className="border border-gray-400 p-2 text-right font-semibold">Balance</th>
-              </tr>
-            </thead>
-            <tbody>
-              {openingBalances.map((item, index) => (
-                <tr key={index}>
-                  <td className="border border-gray-400 p-2">{item.account}</td>
-                  <td className="border border-gray-400 p-2 text-right">{formatCurrency(item.balance)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <h3 className="text-lg font-bold mb-4 bg-blue-100 p-2 border border-gray-400">TOTAL CURRENT BALANCE</h3>
+          <div className="text-center p-4 border-2 bg-blue-100 border-blue-400">
+            <p className="text-2xl font-bold text-blue-900">{formatCurrency(totalBalance)}</p>
+          </div>
         </div>
 
         {/* Summary Section */}
@@ -206,7 +179,7 @@ export default function StatementOfAccountPrint({
               {sortedTransactions.map((transaction) => {
                 const account = accounts.find(acc => acc.id === transaction.account_id);
                 const category = categories.find(cat => cat.id === transaction.category_id);
-                const targetAccount = accounts.find(acc => acc.id === transaction.target_account_id);
+                const targetAccount = accounts.find(acc => acc.target_account_id === transaction.target_account_id);
                 
                 let description = transaction.description || 'Transaction';
                 if (transaction.type === 'transfer') {
@@ -254,4 +227,3 @@ export default function StatementOfAccountPrint({
     </>
   );
 }
-
