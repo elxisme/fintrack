@@ -100,13 +100,12 @@ export default function StatementOfAccountPrint({
             visibility: visible;
           }
           .print-modal-content {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-            margin: 0;
-            padding: 20px;
-            background: white;
+            /* Remove absolute positioning and fixed width/height to allow content to flow across pages */
+            position: static; /* Change from absolute to static */
+            width: auto; /* Allow width to adjust */
+            margin: 0; /* Remove fixed margin */
+            padding: 20px; /* Keep padding */
+            background: white; /* Keep background */
           }
           .no-print {
             display: none !important;
@@ -125,13 +124,12 @@ export default function StatementOfAccountPrint({
           </div>
         </div>
 
-        {/* Summary Section */}
+        {/* Total Balance and Net Income Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-          {/* Total Current Balance */}
+          {/* Total Balance */}
           <div>
             <div className="bg-blue-100 border-2 border-blue-400 p-6 text-center">
-              <h3 className="text-xl font-bold text-blue-800 mb-2">TOT. BALANCE: {formatCurrency(totalBalance)}</h3>
-              
+              <h3 className="text-xl font-bold text-blue-800 mb-2">TOT. BAL: {formatCurrency(totalBalance)}</h3>
             </div>
           </div>
 
@@ -151,7 +149,6 @@ export default function StatementOfAccountPrint({
           <div>
             <div className="bg-green-100 border-2 border-green-400 p-6 text-center">
               <h3 className="text-xl font-bold text-green-800 mb-2">TOTAL INCOME: {formatCurrency(totalIncome)}</h3>
-              
             </div>
           </div>
 
@@ -159,7 +156,6 @@ export default function StatementOfAccountPrint({
           <div>
             <div className="bg-red-100 border-2 border-red-400 p-6 text-center">
               <h3 className="text-xl font-bold text-red-800 mb-2">TOTAL EXPENSES: {formatCurrency(totalExpenses)}</h3>
-              
             </div>
           </div>
         </div>
@@ -230,3 +226,4 @@ export default function StatementOfAccountPrint({
     </>
   );
 }
+
