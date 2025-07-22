@@ -150,16 +150,16 @@ export default function StatementOfAccountPrint({
           {/* Income Summary */}
           <div>
             <div className="bg-green-100 border-2 border-green-400 p-6 text-center">
-              <h3 className="text-xl font-bold text-green-800 mb-2">TOTAL INCOME</h3>
-              <p className="text-2xl font-bold text-green-900">{formatCurrency(totalIncome)}</p>
+              <h3 className="text-xl font-bold text-green-800 mb-2">TOTAL INCOME: {formatCurrency(totalIncome)}</h3>
+              
             </div>
           </div>
 
           {/* Expense Summary */}
           <div>
             <div className="bg-red-100 border-2 border-red-400 p-6 text-center">
-              <h3 className="text-xl font-bold text-red-800 mb-2">TOTAL EXPENSES</h3>
-              <p className="text-2xl font-bold text-red-900">{formatCurrency(totalExpenses)}</p>
+              <h3 className="text-xl font-bold text-red-800 mb-2">TOTAL EXPENSES: {formatCurrency(totalExpenses)}</h3>
+              
             </div>
           </div>
         </div>
