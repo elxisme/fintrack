@@ -125,12 +125,13 @@ export default function StatementOfAccountPrint({
           </div>
         </div>
 
-        {/* Total Balance and Net Income Section */}
+        {/* Summary Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-          {/* Total Balance */}
+          {/* Total Current Balance */}
           <div>
             <div className="bg-blue-100 border-2 border-blue-400 p-6 text-center">
-              <h3 className="text-xl font-bold text-blue-800 mb-2">TOTAL BAL: {formatCurrency(totalBalance)}</h3>
+              <h3 className="text-xl font-bold text-blue-800 mb-2">TOTAL BALANCE: {formatCurrency(totalBalance)}</h3>
+              
             </div>
           </div>
 
@@ -149,15 +150,16 @@ export default function StatementOfAccountPrint({
           {/* Income Summary */}
           <div>
             <div className="bg-green-100 border-2 border-green-400 p-6 text-center">
-              <h3 className="text-xl font-bold text-green-800 mb-2">TOTAL INCOME: {formatCurrency(totalIncome)}</h3>
-              
+              <h3 className="text-xl font-bold text-green-800 mb-2">TOTAL INCOME</h3>
+              <p className="text-2xl font-bold text-green-900">{formatCurrency(totalIncome)}</p>
             </div>
           </div>
 
           {/* Expense Summary */}
           <div>
             <div className="bg-red-100 border-2 border-red-400 p-6 text-center">
-              <h3 className="text-xl font-bold text-red-800 mb-2">TOTAL EXPENSES: {formatCurrency(totalExpenses)}</h3>
+              <h3 className="text-xl font-bold text-red-800 mb-2">TOTAL EXPENSES</h3>
+              <p className="text-2xl font-bold text-red-900">{formatCurrency(totalExpenses)}</p>
             </div>
           </div>
         </div>
