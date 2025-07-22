@@ -95,9 +95,9 @@ class SyncService {
 
   private async syncAccountsFromServer(userId: string): Promise<void> {
     try {
-      console.log('Fetching all accounts from server for authenticated user:', userId);
+      console.log('Fetching all church accounts from server (authenticated user:', userId, ')');
       
-      // Fetch all accounts - RLS policies will handle access control
+      // Fetch all accounts - RLS policies allow all authenticated users to view all accounts
       const { data: serverAccounts, error } = await supabase
         .from('accounts')
         .select('*');
@@ -149,7 +149,7 @@ class SyncService {
           }
         }
       } else {
-        console.log('No accounts found on server for user:', userId);
+        console.log('No accounts found on server');
       }
     } catch (error) {
       console.error('Failed to sync accounts from server:', error);
@@ -158,9 +158,9 @@ class SyncService {
 
   private async syncTransactionsFromServer(userId: string): Promise<void> {
     try {
-      console.log('Fetching all transactions from server for authenticated user:', userId);
+      console.log('Fetching all church transactions from server (authenticated user:', userId, ')');
       
-      // Fetch all transactions - RLS policies will handle access control
+      // Fetch all transactions - RLS policies allow all authenticated users to view all transactions
       const { data: serverTransactions, error } = await supabase
         .from('transactions')
         .select('*');
@@ -216,7 +216,7 @@ class SyncService {
           }
         }
       } else {
-        console.log('No transactions found on server for user:', userId);
+        console.log('No transactions found on server');
       }
     } catch (error) {
       console.error('Failed to sync transactions from server:', error);
