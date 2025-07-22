@@ -62,11 +62,12 @@ export const useFinanceStore = create<FinanceState>((set, get) => ({
 
   loadData: async (userId: string) => {
     try {
-      console.log('Loading data for user:', userId);
+      console.log('Loading data for authenticated user:', userId);
       
       // Always load from offline storage first for immediate UI response
+      // Load all data since viewers should see all church financial data
       const [offlineAccounts, offlineTransactions, offlineCategories] = await Promise.all([
-        getAccountsOffline(userId),
+        getAccountsOffline(''), // Load all accounts regardless of user_id
         getTransactionsOffline(),
         getCategoriesOffline()
       ]);
@@ -104,10 +105,11 @@ export const useFinanceStore = create<FinanceState>((set, get) => ({
 
   reloadDataFromLocal: async (userId: string) => {
     try {
-      console.log('Reloading data from local storage for user:', userId);
+      console.log('Reloading data from local storage for authenticated user:', userId);
       
+      // Load all data since viewers should see all church financial data
       const [offlineAccounts, offlineTransactions, offlineCategories] = await Promise.all([
-        getAccountsOffline(userId),
+        getAccountsOffline(''), // Load all accounts regardless of user_id
         getTransactionsOffline(),
         getCategoriesOffline()
       ]);

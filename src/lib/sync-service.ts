@@ -95,12 +95,12 @@ class SyncService {
 
   private async syncAccountsFromServer(userId: string): Promise<void> {
     try {
-      console.log('Fetching accounts from server for user:', userId);
+      console.log('Fetching all accounts from server for authenticated user:', userId);
       
+      // Fetch all accounts - RLS policies will handle access control
       const { data: serverAccounts, error } = await supabase
         .from('accounts')
-        .select('*')
-        .eq('user_id', userId);
+        .select('*');
       
       if (error) {
         if (error.code === '42P01') {
@@ -116,8 +116,8 @@ class SyncService {
         
         const db = await initDB();
         
-        // Get existing local accounts
-        const localAccounts = await db.getAllFromIndex('accounts', 'by-user', userId);
+        // Get existing local accounts for all users
+        const localAccounts = await db.getAll('accounts');
         const localAccountsMap = new Map(localAccounts.map(acc => [acc.id, acc]));
         
         for (const serverAccount of serverAccounts) {
@@ -158,17 +158,12 @@ class SyncService {
 
   private async syncTransactionsFromServer(userId: string): Promise<void> {
     try {
-      console.log('Fetching transactions from server for user:', userId);
+      console.log('Fetching all transactions from server for authenticated user:', userId);
       
-      // Fetch transactions for all user's accounts using explicit relationship specification
-      // Use the account_id foreign key relationship to avoid ambiguity
+      // Fetch all transactions - RLS policies will handle access control
       const { data: serverTransactions, error } = await supabase
         .from('transactions')
-        .select(`
-          *,
-          accounts!transactions_account_id_fkey!inner(user_id)
-        `)
-        .eq('accounts.user_id', userId);
+        .select('*');
       
       if (error) {
         if (error.code === '42P01') {
@@ -189,8 +184,7 @@ class SyncService {
         const localTransactionsMap = new Map(localTransactions.map(trans => [trans.id, trans]));
         
         for (const serverTransaction of serverTransactions) {
-          // Remove the joined accounts data before storing
-          const { accounts, ...transactionData } = serverTransaction as any;
+          const transactionData = serverTransaction;
           
           const localTransaction = localTransactionsMap.get(transactionData.id);
           

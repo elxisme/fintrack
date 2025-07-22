@@ -110,6 +110,10 @@ export async function saveAccountOffline(account: Account): Promise<void> {
 
 export async function getAccountsOffline(userId: string): Promise<Account[]> {
   const database = await initDB();
+  // If userId is empty, return all accounts (for viewers to see all church accounts)
+  if (!userId) {
+    return database.getAll('accounts');
+  }
   return database.getAllFromIndex('accounts', 'by-user', userId);
 }
 
