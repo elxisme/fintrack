@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, Palette, Plus, Edit2, Trash2, Save, X, AlertTriangle, MoreVertical } from 'lucide-react';
+import { User, Palette, Plus, Edit2, Trash2, Save, X, AlertTriangle, MoreVertical, RefreshCw } from 'lucide-react';
 import { useAuthStore } from '../../store/auth-store';
 import { useFinanceStore } from '../../store/finance-store';
 import { supabase } from '../../lib/supabase';
@@ -74,7 +74,7 @@ export default function Settings({ addToast }: SettingsProps) {
   const authStore = useAuthStore();
   const { user } = authStore;
   const isAdmin = authStore?.isAdmin ?? false;
-  const { categories, loadData, updateCategory, deleteCategory, syncInProgress } = useFinanceStore();
+  const { categories, loadData, updateCategory, deleteCategory, syncInProgress, isOnline } = useFinanceStore();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -279,22 +279,14 @@ export default function Settings({ addToast }: SettingsProps) {
   // Show loading overlay if sync is in progress
   if (syncInProgress) {
     return (
-      <div className="p-4 sm:p-6 bg-gray-50 dark:bg-gray-950 min-h-screen transition-colors duration-200 relative">
-        <div className="absolute inset-0 bg-white/50 dark:bg-gray-900/50 flex items-center justify-center z-10">
-          <div className="text-center">
-            <div className="w-12 h-12 border-4 border-blue-600 dark:border-blue-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-gray-600 dark:text-gray-400">Syncing data...</p>
-          </div>
-        </div>
-        <div className="opacity-50 pointer-events-none">
-          {/* Render the normal content but disabled */}
-          <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8">
-            <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-4 sm:p-6 shadow-sm">
-              <div className="animate-pulse space-y-4">
-                <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/3"></div>
-                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-2/3"></div>
-              </div>
+      <div className="p-4 sm:p-6 bg-gray-50 dark:bg-gray-950 min-h-screen transition-colors duration-200">
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-8 shadow-lg">
+            <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+              <RefreshCw className="w-8 h-8 text-blue-600 dark:text-blue-400 animate-spin" />
             </div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Syncing Data</h3>
+            <p className="text-gray-600 dark:text-gray-400">Please wait while we sync your settings...</p>
           </div>
         </div>
       </div>
@@ -431,27 +423,46 @@ export default function Settings({ addToast }: SettingsProps) {
                             style={{ backgroundColor: category.color }}
                           ></div>
                           <span className="font-medium text-gray-900 dark:text-white text-sm sm:text-base truncate">{category.name}</span>
-                          {!category.user_id && (
-                            <span className="text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-2 py-1 rounded-full whitespace-nowrap">
-                              Default
-                            </span>
-                          )}
                         </div>
-                        {/* Fixed: Admin can manage all categories, regular users can only manage their own */}
-                        {(isAdmin || category.user_id) && (
-                          <div className="flex gap-1 sm:gap-2 ml-2">
+                        {isAdmin && (
+                          <div className="relative ml-2">
                             <button
-                              onClick={() => startEditCategory(category)}
-                              className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                              onClick={() => setActiveCategoryDropdown(activeCategoryDropdown === category.id ? null : category.id)}
+                              className="p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
                             >
-                              <Edit2 className="w-4 h-4" />
+                              <MoreVertical className="w-4 h-4" />
                             </button>
-                            <button
-                              onClick={() => handleDeleteCategory(category.id)}
-                              className="p-2 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
+
+                            {activeCategoryDropdown === category.id && (
+                              <>
+                                <div 
+                                  className="fixed inset-0 z-10" 
+                                  onClick={() => setActiveCategoryDropdown(null)}
+                                />
+                                <div className="absolute right-0 top-full mt-1 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-20">
+                                  <button
+                                    onClick={() => {
+                                      startEditCategory(category);
+                                      setActiveCategoryDropdown(null);
+                                    }}
+                                    className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2"
+                                  >
+                                    <Edit2 className="w-4 h-4" />
+                                    Edit Category
+                                  </button>
+                                  <button
+                                    onClick={() => {
+                                      handleDeleteCategory(category.id);
+                                      setActiveCategoryDropdown(null);
+                                    }}
+                                    className="w-full px-4 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                    Delete Category
+                                  </button>
+                                </div>
+                              </>
+                            )}
                           </div>
                         )}
                       </>
@@ -510,27 +521,46 @@ export default function Settings({ addToast }: SettingsProps) {
                             style={{ backgroundColor: category.color }}
                           ></div>
                           <span className="font-medium text-gray-900 dark:text-white text-sm sm:text-base truncate">{category.name}</span>
-                          {!category.user_id && (
-                            <span className="text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-2 py-1 rounded-full whitespace-nowrap">
-                              Default
-                            </span>
-                          )}
                         </div>
-                        {/* Fixed: Admin can manage all categories, regular users can only manage their own */}
-                        {(isAdmin || category.user_id) && (
-                          <div className="flex gap-1 sm:gap-2 ml-2">
+                        {isAdmin && (
+                          <div className="relative ml-2">
                             <button
-                              onClick={() => startEditCategory(category)}
-                              className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                              onClick={() => setActiveCategoryDropdown(activeCategoryDropdown === category.id ? null : category.id)}
+                              className="p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
                             >
-                              <Edit2 className="w-4 h-4" />
+                              <MoreVertical className="w-4 h-4" />
                             </button>
-                            <button
-                              onClick={() => handleDeleteCategory(category.id)}
-                              className="p-2 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
+
+                            {activeCategoryDropdown === category.id && (
+                              <>
+                                <div 
+                                  className="fixed inset-0 z-10" 
+                                  onClick={() => setActiveCategoryDropdown(null)}
+                                />
+                                <div className="absolute right-0 top-full mt-1 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-20">
+                                  <button
+                                    onClick={() => {
+                                      startEditCategory(category);
+                                      setActiveCategoryDropdown(null);
+                                    }}
+                                    className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2"
+                                  >
+                                    <Edit2 className="w-4 h-4" />
+                                    Edit Category
+                                  </button>
+                                  <button
+                                    onClick={() => {
+                                      handleDeleteCategory(category.id);
+                                      setActiveCategoryDropdown(null);
+                                    }}
+                                    className="w-full px-4 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                    Delete Category
+                                  </button>
+                                </div>
+                              </>
+                            )}
                           </div>
                         )}
                       </>

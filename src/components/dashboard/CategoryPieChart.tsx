@@ -77,7 +77,7 @@ export default function CategoryPieChart({ data, title = "Expenses by Category",
           padding: 20,
           usePointStyle: true,
           pointStyle: 'circle',
-          boxWidth: 15, // Reduced from default ~40 to 15 (approximately 50% reduction)
+          boxWidth: 8, // Reduced by 50% from 15 to 8 for smaller bullet points
           font: {
             size: 12,
           },

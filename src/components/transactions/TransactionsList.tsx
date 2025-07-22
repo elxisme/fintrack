@@ -538,7 +538,7 @@ function TransactionsList({ addToast }: TransactionsListProps) {
             </div>
           )}
         </div>
-      ) : (
+        ) : (
         <div className="text-center py-12">
           <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
             <ArrowUpRight className="w-8 h-8 text-gray-400 dark:text-gray-500" />
@@ -565,7 +565,8 @@ function TransactionsList({ addToast }: TransactionsListProps) {
             </button>
           )}
         </div>
-      )}
+        )}
+      </div>
 
       {/* Create Transaction Modal */}
       {showCreateModal && isAdmin && (
