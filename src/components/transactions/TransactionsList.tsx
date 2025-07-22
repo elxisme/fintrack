@@ -281,7 +281,7 @@ function TransactionsList({ addToast }: TransactionsListProps) {
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col lg:flex-row lg:items-center gap-4 mb-6">
+      <div className="flex flex-col lg:flex-row lg:items-center gap-4 mb-4">
         {/* Date Range Filter */}
         <div className="flex items-center gap-2">
           <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 dark:text-gray-500" />
@@ -377,21 +377,21 @@ function TransactionsList({ addToast }: TransactionsListProps) {
             ))}
           </select>
         </div>
+      </div>
 
-        {/* Results Count and Total */}
-        <div className="flex flex-col sm:flex-row sm:items-center gap-2 lg:ml-auto text-sm text-gray-500 dark:text-gray-400">
-          <span>
-            Showing {visibleTransactions.length} of {filteredTransactions.length} transactions for {dateRange.label}
-          </span>
-          {filteredTransactions.length > 0 && (
-            <>
-              <span className="hidden sm:inline">•</span>
-              <span className="font-medium text-gray-700 dark:text-gray-300">
-                Total: {formatCurrency(filteredTotal)} for {getSelectedCategoryName()}
-              </span>
-            </>
-          )}
-        </div>
+      {/* Results Count and Total */}
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-6 text-sm text-gray-500 dark:text-gray-400">
+        <span>
+          Showing {visibleTransactions.length} of {filteredTransactions.length} transactions for {dateRange.label}
+        </span>
+        {filteredTransactions.length > 0 && (
+          <>
+            <span className="hidden sm:inline">•</span>
+            <span className="font-medium text-gray-700 dark:text-gray-300">
+              Total: {formatCurrency(filteredTotal)} for {getSelectedCategoryName()}
+            </span>
+          </>
+        )}
       </div>
 
       {/* Transactions List */}
