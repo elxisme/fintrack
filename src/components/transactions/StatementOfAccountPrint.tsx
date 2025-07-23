@@ -55,19 +55,14 @@ export default function StatementOfAccountPrint({
     <>
       <style jsx global>{`
         @media print {
-          body * {
-            visibility: hidden;
-          }
-          .print-container, .print-container * {
-            visibility: visible;
-          }
-          .print-container {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
+          body {
             margin: 0;
             padding: 0;
+          }
+          .print-container {
+            width: 100%;
+            margin: 0;
+            padding: 1cm;
             font-size: 12px;
             background: white;
           }
@@ -78,6 +73,8 @@ export default function StatementOfAccountPrint({
             display: none !important;
           }
           table {
+            width: 100%;
+            border-collapse: collapse;
             page-break-inside: auto;
           }
           tr {
@@ -90,10 +87,14 @@ export default function StatementOfAccountPrint({
           tfoot {
             display: table-footer-group;
           }
+          @page {
+            size: A4 portrait;
+            margin: 1cm;
+          }
         }
       `}</style>
 
-      <div className="print-container p-4 bg-white text-gray-800">
+      <div className="print-container">
         {/* Header */}
         <header className="text-center mb-6">
           <h1 className="text-xl font-bold mb-1">CHURCH OF CHRIST, KAGINI</h1>
@@ -104,7 +105,7 @@ export default function StatementOfAccountPrint({
           </div>
         </header>
 
-        {/* Key Metrics - Single Row */}
+        {/* Key Metrics */}
         <div className="grid grid-cols-4 gap-2 mb-4 text-xs">
           <div className="bg-blue-50 p-2 border border-blue-200 rounded text-center">
             <div className="font-medium">Total Balance</div>
@@ -127,7 +128,7 @@ export default function StatementOfAccountPrint({
         {/* Transactions Table */}
         <div className="mb-4">
           <h3 className="text-sm font-bold mb-2 bg-gray-100 p-1 px-2">TRANSACTION DETAILS</h3>
-          <table className="w-full border-collapse text-xs">
+          <table className="w-full">
             <thead>
               <tr className="bg-gray-100">
                 <th className="border border-gray-300 p-1 text-left">Date</th>
@@ -145,13 +146,19 @@ export default function StatementOfAccountPrint({
                 
                 let description = transaction.description || 'Transaction';
                 if (transaction.type === 'transfer') {
-                  description = `Transfer: ${account?.name} → ${targetAccount?.name}`;
+                  description = `Transfer: ${account?.name || '?'} → ${targetAccount?.name || '?'}`;
                 }
+
+                const rowColorClass = transaction.type === 'income' 
+                  ? 'border-l-4 border-l-green-500' 
+                  : transaction.type === 'expense' 
+                    ? 'border-l-4 border-l-red-500' 
+                    : 'border-l-4 border-l-blue-500';
 
                 return (
                   <tr 
                     key={transaction.id} 
-                    className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
+                    className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} ${rowColorClass}`}
                   >
                     <td className="border border-gray-300 p-1">{format(new Date(transaction.date), 'MMM dd')}</td>
                     <td className="border border-gray-300 p-1">{description}</td>
