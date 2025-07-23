@@ -101,8 +101,10 @@ export default function StatementOfAccountPrint({
           }
           .print-modal-content {
             position: static;
-            margin: 0;
-            padding: 20px;
+            width: 100% !important;
+            max-width: none !important;
+            margin: 0 !important;
+            padding: 20px !important;
             background: white;
           }
           .no-print {
@@ -111,7 +113,7 @@ export default function StatementOfAccountPrint({
         }
       `}</style>
 
-      <div className="print-modal-content max-w-4xl mx-auto p-8 bg-white text-black">
+      <div className="print-modal-content p-8 bg-white text-black">
         {/* Header */}
         <div className="text-center mb-8 border-b-2 border-gray-800 pb-6">
           <h1 className="text-3xl font-bold mb-2">CHURCH OF CHRIST, KAGINI (CoCKFin)</h1>
