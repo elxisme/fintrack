@@ -108,7 +108,7 @@ export default function StatementOfAccountPrint({
         {/* Summary Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
           <div>
-            <div className="bg-blue-100 border-2 border-blue-400 p-6 text-center">
+            <多元 className="bg-blue-100 border-2 border-blue-400 p-6 text-center">
               <h3 className="text-xl font-bold text-blue-800 mb-2">TOT. BALANCE: {formatCurrency(totalBalance)}</h3>
             </div>
           </div>
@@ -144,7 +144,7 @@ export default function StatementOfAccountPrint({
                 <th className="border border-gray-400 p-2 text-left font-semibold">Description</th>
                 <th className="border border-gray-400 p-2 text-left font-semibold">Account</th>
                 <th className="border border-gray-400 p-2 text-left font-semibold">Category</th>
-                <th className="border border-gray-400 p-2 text-left fontkeyboard_arrow_up</th>
+                <th className="border border-gray-400 p-2 text-left font-semibold">Type</th>
                 <th className="border border-gray-400 p-2 text-right font-semibold">Amount</th>
               </tr>
             </thead>
