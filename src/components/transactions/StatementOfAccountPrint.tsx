@@ -80,6 +80,7 @@ export default function StatementOfAccountPrint({
             margin-bottom: 30px;
             border-bottom: 3px solid #2563eb;
             padding-bottom: 20px;
+            page-break-after: avoid; /* Keep header with content */
           }
           
           .print-header h1 {
@@ -108,6 +109,7 @@ export default function StatementOfAccountPrint({
             grid-template-columns: repeat(4, 1fr);
             gap: 15px;
             margin: 25px 0;
+            page-break-inside: avoid; /* Keep summary boxes together */
           }
           
           .summary-box {
@@ -170,6 +172,7 @@ export default function StatementOfAccountPrint({
             padding: 10px 15px;
             background: #f3f4f6;
             border-left: 4px solid #3b82f6;
+            page-break-after: avoid; /* Keep section title with its content */
           }
           
           .transactions-table {
@@ -189,6 +192,15 @@ export default function StatementOfAccountPrint({
             font-size: 9px;
             text-transform: uppercase;
             letter-spacing: 0.3px;
+          }
+          
+          .transactions-table thead {
+            display: table-header-group; /* Repeat table header on each page */
+          }
+          
+          .transactions-table tr {
+            page-break-inside: avoid; /* Prevent breaking rows across pages */
+            page-break-after: auto;
           }
           
           .transactions-table td {
@@ -226,6 +238,7 @@ export default function StatementOfAccountPrint({
             border-top: 1px solid #e5e7eb;
             font-size: 9px;
             color: #6b7280;
+            page-break-before: avoid; /* Keep footer with content */
           }
           
           .screen-only {
