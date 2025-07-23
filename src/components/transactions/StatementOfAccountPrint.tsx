@@ -1,5 +1,4 @@
 import React from 'react';
-import { format } from 'date-fns';
 
 // Mock data for demonstration
 const mockTransactions = [
@@ -36,6 +35,34 @@ export default function StatementOfAccountPrint({
   dateRange = mockDateRange,
   exchangeRate = null
 }) {
+  // Date formatting helper
+  const formatDate = (dateStr, format = 'full') => {
+    const date = new Date(dateStr);
+    if (format === 'short') {
+      return date.toLocaleDateString('en-GB', { 
+        day: '2-digit', 
+        month: '2-digit', 
+        year: '2-digit' 
+      });
+    }
+    return date.toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+  };
+
+  const formatDateTime = (date) => {
+    return date.toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: '2-digit', 
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    });
+  };
+
   // Format currency helper
   const formatCurrency = (amount) => {
     if (exchangeRate) {
@@ -62,6 +89,11 @@ export default function StatementOfAccountPrint({
   return (
     <>
       <style jsx global>{`
+        @page {
+          size: A4;
+          margin: 15mm;
+        }
+        
         @media print {
           * {
             -webkit-print-color-adjust: exact !important;
@@ -69,75 +101,117 @@ export default function StatementOfAccountPrint({
             print-color-adjust: exact !important;
           }
           
-          body {
-            margin: 0;
-            padding: 0;
-            font-size: 12px;
-            line-height: 1.4;
+          html, body {
+            margin: 0 !important;
+            padding: 0 !important;
+            font-size: 12px !important;
+            line-height: 1.3 !important;
+            height: auto !important;
+            overflow: visible !important;
           }
           
           .print-container {
             width: 100% !important;
             max-width: none !important;
             margin: 0 !important;
-            padding: 15mm !important;
+            padding: 0 !important;
             box-shadow: none !important;
-          }
-          
-          .page-break {
-            page-break-before: always;
-          }
-          
-          .no-break {
-            page-break-inside: avoid;
+            background: white !important;
+            height: auto !important;
+            min-height: auto !important;
           }
           
           .print-header {
             page-break-after: avoid;
+            page-break-inside: avoid;
+            margin-bottom: 15px !important;
           }
           
           .print-summary {
             page-break-inside: avoid;
-            page-break-after: avoid;
+            margin-bottom: 15px !important;
           }
           
-          .transaction-row {
+          .transactions-section {
+            page-break-inside: auto;
+          }
+          
+          .transaction-table {
+            width: 100% !important;
+            border-collapse: collapse !important;
+            page-break-inside: auto;
+          }
+          
+          .transaction-table thead {
+            display: table-header-group;
+          }
+          
+          .transaction-table thead tr {
+            page-break-after: avoid;
             page-break-inside: avoid;
+          }
+          
+          .transaction-table tbody tr {
+            page-break-inside: avoid;
+            page-break-after: auto;
+          }
+          
+          .transaction-table tbody tr:nth-child(10n) {
+            page-break-after: auto;
+          }
+          
+          .print-footer {
+            page-break-inside: avoid;
+            margin-top: 20px !important;
           }
           
           .print-button {
             display: none !important;
           }
           
-          table {
-            border-collapse: collapse !important;
-          }
-          
           th, td {
             border: 1px solid #000 !important;
-            padding: 4px !important;
-            font-size: 11px !important;
+            padding: 3px !important;
+            font-size: 10px !important;
+            vertical-align: top !important;
+          }
+          
+          th {
+            background-color: #e5e5e5 !important;
+            font-weight: bold !important;
           }
           
           .header-title {
-            font-size: 18px !important;
+            font-size: 16px !important;
             font-weight: bold !important;
+            margin-bottom: 5px !important;
           }
           
           .summary-box {
             border: 2px solid #000 !important;
-            background-color: #f5f5f5 !important;
+            background-color: #f8f8f8 !important;
+            padding: 8px !important;
+          }
+          
+          .summary-title {
+            font-size: 11px !important;
+            font-weight: bold !important;
+          }
+          
+          .summary-amount {
+            font-size: 13px !important;
+            font-weight: bold !important;
           }
         }
         
         @media screen {
           .print-container {
             max-width: 210mm;
-            min-height: 297mm;
             margin: 20px auto;
-            padding: 20mm;
+            padding: 20px;
             background: white;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            min-height: 297mm;
           }
         }
       `}</style>
@@ -149,7 +223,7 @@ export default function StatementOfAccountPrint({
           <h2 className="text-lg font-semibold mb-3">STATEMENT OF ACCOUNT</h2>
           <div className="text-sm space-y-1">
             <p><strong>Period:</strong> {dateRange.label}</p>
-            <p><strong>Generated:</strong> {format(new Date(), 'MMMM dd, yyyy')}</p>
+            <p><strong>Generated:</strong> {formatDate(new Date())}</p>
           </div>
         </div>
 
@@ -159,42 +233,42 @@ export default function StatementOfAccountPrint({
           
           <div className="grid grid-cols-2 gap-4 mb-4">
             <div className="summary-box p-4 text-center border-2 border-black bg-gray-100">
-              <div className="text-sm font-semibold mb-1">CURRENT BALANCE</div>
-              <div className="text-lg font-bold">{formatCurrency(totalBalance)}</div>
+              <div className="summary-title text-sm font-semibold mb-1">CURRENT BALANCE</div>
+              <div className="summary-amount text-lg font-bold">{formatCurrency(totalBalance)}</div>
             </div>
             <div className={`summary-box p-4 text-center border-2 border-black ${netIncome >= 0 ? 'bg-green-50' : 'bg-red-50'}`}>
-              <div className="text-sm font-semibold mb-1">NET INCOME</div>
-              <div className="text-lg font-bold">{formatCurrency(netIncome)}</div>
+              <div className="summary-title text-sm font-semibold mb-1">NET INCOME</div>
+              <div className="summary-amount text-lg font-bold">{formatCurrency(netIncome)}</div>
             </div>
           </div>
           
           <div className="grid grid-cols-2 gap-4">
             <div className="summary-box p-4 text-center border-2 border-black bg-green-50">
-              <div className="text-sm font-semibold mb-1">TOTAL INCOME</div>
-              <div className="text-base font-bold">{formatCurrency(totalIncome)}</div>
+              <div className="summary-title text-sm font-semibold mb-1">TOTAL INCOME</div>
+              <div className="summary-amount text-base font-bold">{formatCurrency(totalIncome)}</div>
             </div>
             <div className="summary-box p-4 text-center border-2 border-black bg-red-50">
-              <div className="text-sm font-semibold mb-1">TOTAL EXPENSES</div>
-              <div className="text-base font-bold">{formatCurrency(totalExpenses)}</div>
+              <div className="summary-title text-sm font-semibold mb-1">TOTAL EXPENSES</div>
+              <div className="summary-amount text-base font-bold">{formatCurrency(totalExpenses)}</div>
             </div>
           </div>
         </div>
 
         {/* Transactions Section */}
-        <div className="mb-8">
+        <div className="transactions-section">
           <h3 className="text-base font-bold mb-3 p-2 bg-gray-100 border border-black text-center">
             TRANSACTION DETAILS
           </h3>
           
-          <table className="w-full border-collapse text-xs">
+          <table className="transaction-table w-full border-collapse text-xs">
             <thead>
               <tr className="bg-gray-200">
-                <th className="border border-black p-2 text-left w-20">Date</th>
+                <th className="border border-black p-2 text-left w-16">Date</th>
                 <th className="border border-black p-2 text-left">Description</th>
-                <th className="border border-black p-2 text-left w-24">Account</th>
-                <th className="border border-black p-2 text-left w-24">Category</th>
-                <th className="border border-black p-2 text-center w-16">Type</th>
-                <th className="border border-black p-2 text-right w-24">Amount</th>
+                <th className="border border-black p-2 text-left w-20">Account</th>
+                <th className="border border-black p-2 text-left w-20">Category</th>
+                <th className="border border-black p-2 text-center w-12">Type</th>
+                <th className="border border-black p-2 text-right w-20">Amount</th>
               </tr>
             </thead>
             <tbody>
@@ -203,9 +277,9 @@ export default function StatementOfAccountPrint({
                 const category = categories.find(cat => cat.id === transaction.category_id);
                 
                 return (
-                  <tr key={transaction.id} className="transaction-row">
+                  <tr key={transaction.id}>
                     <td className="border border-black p-2 text-xs">
-                      {format(new Date(transaction.date), 'dd/MM/yy')}
+                      {formatDate(transaction.date, 'short')}
                     </td>
                     <td className="border border-black p-2 text-xs">
                       {transaction.description || 'Transaction'}
@@ -233,10 +307,10 @@ export default function StatementOfAccountPrint({
         </div>
 
         {/* Footer */}
-        <div className="mt-8 pt-4 border-t border-black text-center text-xs text-gray-600 no-break">
+        <div className="print-footer mt-8 pt-4 border-t border-black text-center text-xs text-gray-600">
           <p className="mb-1"><strong>ChurchTrack Financial Management System</strong></p>
           <p>This is a computer-generated document. No signature required.</p>
-          <p className="mt-2">Page generated on {format(new Date(), 'dd/MM/yyyy HH:mm')}</p>
+          <p className="mt-2">Page generated on {formatDateTime(new Date())}</p>
         </div>
 
         {/* Print Button */}
