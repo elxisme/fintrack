@@ -91,59 +91,121 @@ export default function StatementOfAccountPrint({
 
   return (
     <>
+      {/* ================================================ */}
+      {/* UPDATED PRINT STYLES - MAIN CHANGES START HERE */}
+      {/* ================================================ */}
       <style jsx global>{`
-  @media print {
-    body * {
-      visibility: hidden;
-    }
-    .print-modal-content, .print-modal-content * {
-      visibility: visible;
-    }
-    .print-modal-content {
-      position: static;
-      width: 100% !important;
-      max-width: none !important;
-      margin: 0 !important;
-      padding: 20px !important;
-      background: white;
-      height: auto !important;
-      overflow: visible !important;
-    }
-    .no-print {
-      display: none !important;
-    }
-    
-    /* Ensure tables break properly across pages */
-    table {
-      page-break-inside: auto !important;
-    }
-    tr {
-      page-break-inside: avoid !important;
-      page-break-after: auto !important;
-    }
-    thead {
-      display: table-header-group !important;
-    }
-    
-    /* General page break control */
-    .page-break {
-      page-break-after: always;
-    }
-    .avoid-break {
-      page-break-inside: avoid;
-    }
-    
-    /* Print margins */
-    @page {
-      size: auto;
-      margin: 15mm 10mm;
-    }
-  }
-`}</style>
+        /* New screen-only and print-only utility classes */
+        .screen-only {
+          display: block;
+        }
+        .no-screen {
+          display: none;
+        }
+        
+        @media print {
+          .screen-only {
+            display: none !important;
+          }
+          .no-screen {
+            display: block !important;
+          }
+          
+          body * {
+            visibility: hidden;
+          }
+          .print-modal-content, .print-modal-content * {
+            visibility: visible;
+          }
+          .print-modal-content {
+            position: static;
+            width: 100% !important;
+            max-width: none !important;
+            margin: 0 !important;
+            padding: 20px !important;
+            background: white;
+            height: auto !important;
+            overflow: visible !important;
+          }
+          
+          /* Fixed header for all printed pages */
+          .print-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 10px 20px;
+            border-bottom: 1px solid #ddd;
+            z-index: 1000;
+            width: 100%;
+          }
+          
+          /* Main content starts below fixed header */
+          .print-content {
+            margin-top: 120px;
+          }
+          
+          /* Improved table printing */
+          table {
+            page-break-inside: auto !important;
+            width: 100% !important;
+          }
+          tr {
+            page-break-inside: avoid !important;
+            page-break-after: auto !important;
+          }
+          thead {
+            display: table-header-group !important;
+          }
+          thead th {
+            background: #f1f1f1 !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+          }
+          
+          /* Print margins */
+          @page {
+            size: auto;
+            margin-top: 100px; /* Space for fixed header */
+            margin-bottom: 20mm;
+            margin-left: 10mm;
+            margin-right: 10mm;
+          }
+          
+          .no-print {
+            display: none !important;
+          }
+        }
+      `}</style>
 
       <div className="print-modal-content p-8 bg-white text-black">
-        {/* Header */}
-        <div className="text-center mb-8 border-b-2 border-gray-800 pb-6">
+        {/* ================================================ */}
+        {/* NEW PRINT HEADER (VISIBLE ONLY WHEN PRINTING) */}
+        {/* ================================================ */}
+        <div className="print-header no-screen">
+          <h1 className="text-xl font-bold mb-1">CHURCH OF CHRIST, KAGINI (CoCKFin)</h1>
+          <h2 className="text-lg font-semibold mb-2">STATEMENT OF ACCOUNT</h2>
+          <div className="text-xs">
+            <p><strong>Period:</strong> {dateRange.label}</p>
+            <p><strong>Generated on:</strong> {format(new Date(), 'MMMM dd, yyyy')}</p>
+          </div>
+          
+          {/* Compact balance summary for print header */}
+          <div className="grid grid-cols-2 gap-4 mt-2 text-sm">
+            <div>
+              <p><strong>TOT. BALANCE:</strong> {formatCurrency(totalBalance)}</p>
+            </div>
+            <div>
+              <p><strong>NET INCOME:</strong> {formatCurrency(netIncome)}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* ================================================ */}
+        {/* REGULAR HEADER (VISIBLE ONLY ON SCREEN) */}
+        {/* ================================================ */}
+        <div className="screen-only text-center mb-8 border-b-2 border-gray-800 pb-6">
           <h1 className="text-3xl font-bold mb-2">CHURCH OF CHRIST, KAGINI (CoCKFin)</h1>
           <h2 className="text-xl font-semibold mb-4">STATEMENT OF ACCOUNT</h2>
           <div className="text-sm">
@@ -152,72 +214,73 @@ export default function StatementOfAccountPrint({
           </div>
         </div>
 
-        {/* Summary Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-          {/* Total Current Balance */}
-          <div>
-            <div className="bg-blue-100 border-2 border-blue-400 p-6 text-center">
-              <h3 className="text-xl font-bold text-blue-800 mb-2">TOT. BALANCE: {formatCurrency(totalBalance)}</h3>
-              
+        {/* ================================================ */}
+        {/* MAIN CONTENT (WRAPPED IN PRINT-CONTENT DIV) */}
+        {/* ================================================ */}
+        <div className="print-content">
+          {/* Summary Section */}
+          <div className="screen-only grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+            {/* Total Current Balance */}
+            <div>
+              <div className="bg-blue-100 border-2 border-blue-400 p-6 text-center">
+                <h3 className="text-xl font-bold text-blue-800 mb-2">TOT. BALANCE: {formatCurrency(totalBalance)}</h3>
+              </div>
+            </div>
+
+            {/* Net Income */}
+            <div>
+              <div className={`text-center p-6 border-2 ${netIncome >= 0 ? 'bg-green-100 border-green-400' : 'bg-red-100 border-red-400'}`}>
+                <h3 className="text-xl font-bold">
+                  NET INCOME: {formatCurrency(netIncome)}
+                </h3>
+              </div>
             </div>
           </div>
 
-          {/* Net Income */}
-          <div>
-            <div className={`text-center p-6 border-2 ${netIncome >= 0 ? 'bg-green-100 border-green-400' : 'bg-red-100 border-red-400'}`}>
-              <h3 className="text-xl font-bold">
-                NET INCOME: {formatCurrency(netIncome)}
-              </h3>
+          {/* Income and Expense Summaries */}
+          <div className="screen-only grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+            {/* Income Summary */}
+            <div>
+              <div className="bg-green-100 border-2 border-green-400 p-6 text-center">
+                <h3 className="text-xl font-bold text-green-800 mb-2">TOTAL INCOME: {formatCurrency(totalIncome)}</h3>
+              </div>
             </div>
-          </div>
-        </div>
 
-        {/* Income and Expense Summaries */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-          {/* Income Summary */}
-          <div>
-            <div className="bg-green-100 border-2 border-green-400 p-6 text-center">
-              <h3 className="text-xl font-bold text-green-800 mb-2">TOTAL INCOME: {formatCurrency(totalIncome)}</h3>
-              
+            {/* Expense Summary */}
+            <div>
+              <div className="bg-red-100 border-2 border-red-400 p-6 text-center">
+                <h3 className="text-xl font-bold text-red-800 mb-2">TOTAL EXPENSES: {formatCurrency(totalExpenses)}</h3>
+              </div>
             </div>
           </div>
 
-          {/* Expense Summary */}
+          {/* Detailed Transactions */}
           <div>
-            <div className="bg-red-100 border-2 border-red-400 p-6 text-center">
-              <h3 className="text-xl font-bold text-red-800 mb-2">TOTAL EXPENSES: {formatCurrency(totalExpenses)}</h3>
-              
-            </div>
-          </div>
-        </div>
+            <h3 className="text-lg font-bold mb-4 bg-blue-100 p-2 border border-gray-400">DETAILED TRANSACTIONS</h3>
+            <table className="w-full border-collapse border border-gray-400 text-sm">
+              <thead>
+                <tr className="bg-gray-100">
+                  <th className="border border-gray-400 p-2 text-left font-semibold">Date</th>
+                  <th className="border border-gray-400 p-2 text-left font-semibold">Description</th>
+                  <th className="border border-gray-400 p-2 text-left font-semibold">Account</th>
+                  <th className="border border-gray-400 p-2 text-left font-semibold">Category</th>
+                  <th className="border border-gray-400 p-2 text-left font-semibold">Type</th>
+                  <th className="border border-gray-400 p-2 text-right font-semibold">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                {sortedTransactions.map((transaction) => {
+                  const account = accounts.find(acc => acc.id === transaction.account_id);
+                  const category = categories.find(cat => cat.id === transaction.category_id);
+                  const targetAccount = accounts.find(acc => acc.id === transaction.target_account_id);
+                  
+                  let description = transaction.description || 'Transaction';
+                  if (transaction.type === 'transfer') {
+                    description = `Transfer: ${account?.name} → ${targetAccount?.name}`;
+                  }
 
-        {/* Detailed Transactions */}
-        <div>
-          <h3 className="text-lg font-bold mb-4 bg-blue-100 p-2 border border-gray-400">DETAILED TRANSACTIONS</h3>
-          <table className="w-full border-collapse border border-gray-400 text-sm">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="border border-gray-400 p-2 text-left font-semibold">Date</th>
-                <th className="border border-gray-400 p-2 text-left font-semibold">Description</th>
-                <th className="border border-gray-400 p-2 text-left font-semibold">Account</th>
-                <th className="border border-gray-400 p-2 text-left font-semibold">Category</th>
-                <th className="border border-gray-400 p-2 text-left font-semibold">Type</th>
-                <th className="border border-gray-400 p-2 text-right font-semibold">Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sortedTransactions.map((transaction) => {
-                const account = accounts.find(acc => acc.id === transaction.account_id);
-                const category = categories.find(cat => cat.id === transaction.category_id);
-                const targetAccount = accounts.find(acc => acc.id === transaction.target_account_id);
-                
-                let description = transaction.description || 'Transaction';
-                if (transaction.type === 'transfer') {
-                  description = `Transfer: ${account?.name} → ${targetAccount?.name}`;
-                }
-
-                return (
-                  <tr key={transaction.id} className={transaction.type === 'income' ? 'bg-green-25' : transaction.type === 'expense' ? 'bg-red-25' : 'bg-blue-25'}>
+                  return (
+                    <tr key={transaction.id} className={transaction.type === 'income' ? 'bg-green-25' : transaction.type === 'expense' ? 'bg-red-25' : 'bg-blue-25'}>
                     <td className="border border-gray-400 p-2">{format(new Date(transaction.date), 'MMM dd, yyyy')}</td>
                     <td className="border border-gray-400 p-2">{description}</td>
                     <td className="border border-gray-400 p-2">{account?.name || 'Unknown Account'}</td>
@@ -232,26 +295,27 @@ export default function StatementOfAccountPrint({
                       }
                     </td>
                   </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
 
-        {/* Footer */}
-        <div className="mt-8 pt-4 border-t border-gray-400 text-center text-sm text-gray-600">
-          <p>Generated by CoCKFin Financial Management System</p>
-          <p>This is a computer-generated document and does not require a signature.</p>
-        </div>
+          {/* Footer */}
+          <div className="mt-8 pt-4 border-t border-gray-400 text-center text-sm text-gray-600">
+            <p>Generated by CoCKFin Financial Management System</p>
+            <p>This is a computer-generated document and does not require a signature.</p>
+          </div>
 
-        {/* Print Button (hidden when printing) */}
-        <div className="no-print mt-8 text-center">
-          <button
-            onClick={() => window.print()}
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
-          >
-            Print Statement
-          </button>
+          {/* Print Button (hidden when printing) */}
+          <div className="no-print mt-8 text-center">
+            <button
+              onClick={() => window.print()}
+              className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+            >
+              Print Statement
+            </button>
+          </div>
         </div>
       </div>
     </>
