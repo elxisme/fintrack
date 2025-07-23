@@ -113,27 +113,9 @@ export default function StatementOfAccountPrint({
       display: none !important;
     }
     
-    /* Header styles for printing */
-    .print-header {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      background: white;
-      padding: 10px 20px;
-      border-bottom: 1px solid #ddd;
-      z-index: 1000;
-    }
-    
-    /* Main content should start below the fixed header */
-    .print-content {
-      margin-top: 120px; /* Adjust based on your header height */
-    }
-    
-    /* Table printing improvements */
+    /* Ensure tables break properly across pages */
     table {
       page-break-inside: auto !important;
-      width: 100% !important;
     }
     tr {
       page-break-inside: avoid !important;
@@ -142,53 +124,53 @@ export default function StatementOfAccountPrint({
     thead {
       display: table-header-group !important;
     }
-    thead th {
-      background: #f1f1f1 !important;
-      -webkit-print-color-adjust: exact;
-      print-color-adjust: exact;
+    
+    /* General page break control */
+    .page-break {
+      page-break-after: always;
+    }
+    .avoid-break {
+      page-break-inside: avoid;
     }
     
     /* Print margins */
     @page {
       size: auto;
-      margin-top: 100px; /* Space for fixed header */
-      margin-bottom: 20mm;
-      margin-left: 10mm;
-      margin-right: 10mm;
+      margin: 15mm 10mm;
     }
   }
 `}</style>
 
-<div className="print-modal-content p-8 bg-white text-black">
-  {/* Fixed header for printing */}
-  <div className="print-header no-screen">
-    <h1 className="text-xl font-bold mb-1">CHURCH OF CHRIST, KAGINI (CoCKFin)</h1>
-    <h2 className="text-lg font-semibold mb-2">STATEMENT OF ACCOUNT</h2>
-    <div className="text-xs">
-      <p><strong>Period:</strong> {dateRange.label}</p>
-      <p><strong>Generated on:</strong> {format(new Date(), 'MMMM dd, yyyy')}</p>
-    </div>
-    
-    {/* Summary balances - compact version */}
-    <div className="grid grid-cols-2 gap-4 mt-2 text-sm">
-      <div>
-        <p><strong>TOT. BALANCE:</strong> {formatCurrency(totalBalance)}</p>
-      </div>
-      <div>
-        <p><strong>NET INCOME:</strong> {formatCurrency(netIncome)}</p>
-      </div>
-    </div>
-  </div>
+      <div className="print-modal-content p-8 bg-white text-black">
+        {/* Header */}
+        <div className="text-center mb-8 border-b-2 border-gray-800 pb-6">
+          <h1 className="text-3xl font-bold mb-2">CHURCH OF CHRIST, KAGINI (CoCKFin)</h1>
+          <h2 className="text-xl font-semibold mb-4">STATEMENT OF ACCOUNT</h2>
+          <div className="text-sm">
+            <p><strong>Period:</strong> {dateRange.label}</p>
+            <p><strong>Generated on:</strong> {format(new Date(), 'MMMM dd, yyyy')}</p>
+          </div>
+        </div>
 
-  {/* Regular header (visible on screen) */}
-  <div className="screen-only text-center mb-8 border-b-2 border-gray-800 pb-6">
-    <h1 className="text-3xl font-bold mb-2">CHURCH OF CHRIST, KAGINI (CoCKFin)</h1>
-    <h2 className="text-xl font-semibold mb-4">STATEMENT OF ACCOUNT</h2>
-    <div className="text-sm">
-      <p><strong>Period:</strong> {dateRange.label}</p>
-      <p><strong>Generated on:</strong> {format(new Date(), 'MMMM dd, yyyy')}</p>
-    </div>
-  </div>
+        {/* Summary Section */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+          {/* Total Current Balance */}
+          <div>
+            <div className="bg-blue-100 border-2 border-blue-400 p-6 text-center">
+              <h3 className="text-xl font-bold text-blue-800 mb-2">TOT. BALANCE: {formatCurrency(totalBalance)}</h3>
+              
+            </div>
+          </div>
+
+          {/* Net Income */}
+          <div>
+            <div className={`text-center p-6 border-2 ${netIncome >= 0 ? 'bg-green-100 border-green-400' : 'bg-red-100 border-red-400'}`}>
+              <h3 className="text-xl font-bold">
+                NET INCOME: {formatCurrency(netIncome)}
+              </h3>
+            </div>
+          </div>
+        </div>
 
         {/* Income and Expense Summaries */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
