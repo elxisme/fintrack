@@ -92,26 +92,54 @@ export default function StatementOfAccountPrint({
   return (
     <>
       <style jsx global>{`
-        @media print {
-          body * {
-            visibility: hidden;
-          }
-          .print-modal-content, .print-modal-content * {
-            visibility: visible;
-          }
-          .print-modal-content {
-            position: static;
-            width: 100% !important;
-            max-width: none !important;
-            margin: 0 !important;
-            padding: 20px !important;
-            background: white;
-          }
-          .no-print {
-            display: none !important;
-          }
-        }
-      `}</style>
+  @media print {
+    body * {
+      visibility: hidden;
+    }
+    .print-modal-content, .print-modal-content * {
+      visibility: visible;
+    }
+    .print-modal-content {
+      position: static;
+      width: 100% !important;
+      max-width: none !important;
+      margin: 0 !important;
+      padding: 20px !important;
+      background: white;
+      height: auto !important;
+      overflow: visible !important;
+    }
+    .no-print {
+      display: none !important;
+    }
+    
+    /* Ensure tables break properly across pages */
+    table {
+      page-break-inside: auto !important;
+    }
+    tr {
+      page-break-inside: avoid !important;
+      page-break-after: auto !important;
+    }
+    thead {
+      display: table-header-group !important;
+    }
+    
+    /* General page break control */
+    .page-break {
+      page-break-after: always;
+    }
+    .avoid-break {
+      page-break-inside: avoid;
+    }
+    
+    /* Print margins */
+    @page {
+      size: auto;
+      margin: 15mm 10mm;
+    }
+  }
+`}</style>
 
       <div className="print-modal-content p-8 bg-white text-black">
         {/* Header */}
