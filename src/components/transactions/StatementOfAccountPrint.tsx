@@ -30,7 +30,7 @@ export default function StatementOfAccountPrint({
         currency: 'USD'
       }).format(usdAmount);
     }
-    return `N${new Intl.NumberFormat('en-NG').format(amount)}`;
+    return `₦${new Intl.NumberFormat('en-NG').format(amount)}`;
   };
 
   // Calculate total balance from all accounts
@@ -54,6 +54,9 @@ export default function StatementOfAccountPrint({
   return (
     <>
       <style jsx global>{`
+        /* Import Google Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
         /* Print styles */
         @media print {
           body * {
@@ -63,87 +66,168 @@ export default function StatementOfAccountPrint({
             visibility: visible;
           }
           .print-container {
-            position: relative;
+            position: static;
             width: 100%;
             margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-            color: #000;
+            padding: 20px;
+            font-family: 'Inter', Arial, sans-serif;
+            color: #1a1a1a;
+            background: white;
           }
           
-          /* Header styles to match image */
           .print-header {
             text-align: center;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #000;
-            padding-bottom: 10px;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 20px;
           }
+          
           .print-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0 0 8px 0;
+            color: #1e40af;
+            letter-spacing: 0.5px;
+          }
+          
+          .print-header h2 {
             font-size: 18px;
-            font-weight: bold;
+            font-weight: 600;
+            margin: 0 0 15px 0;
+            color: #374151;
+          }
+          
+          .print-header .meta-info {
+            font-size: 12px;
+            color: #6b7280;
             margin: 5px 0;
           }
-          .print-header h2 {
-            font-size: 16px;
-            font-weight: bold;
-            margin: 5px 0 10px;
-          }
-          .print-header p {
-            font-size: 14px;
-            margin: 3px 0;
-          }
           
-          /* Summary boxes */
           .summary-grid {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin: 15px 0;
-            flex-wrap: wrap;
-          }
-          .summary-box {
-            border: 1px solid #000;
-            padding: 10px 15px;
-            text-align: center;
-            min-width: 150px;
-          }
-          .summary-box h3 {
-            font-weight: bold;
-            font-size: 14px;
-            margin: 0 0 5px 0;
-          }
-          .summary-box p {
-            font-size: 14px;
-            margin: 0;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin: 25px 0;
           }
           
-          /* Transactions table */
+          .summary-box {
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            background: #f9fafb;
+          }
+          
+          .summary-box.total-balance {
+            border-color: #3b82f6;
+            background: #eff6ff;
+          }
+          
+          .summary-box.net-income {
+            border-color: #10b981;
+            background: #ecfdf5;
+          }
+          
+          .summary-box.total-income {
+            border-color: #059669;
+            background: #f0fdf4;
+          }
+          
+          .summary-box.total-expenses {
+            border-color: #dc2626;
+            background: #fef2f2;
+          }
+          
+          .summary-box h3 {
+            font-weight: 600;
+            font-size: 11px;
+            margin: 0 0 8px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          }
+          
+          .summary-box.total-balance h3 { color: #1d4ed8; }
+          .summary-box.net-income h3 { color: #047857; }
+          .summary-box.total-income h3 { color: #065f46; }
+          .summary-box.total-expenses h3 { color: #b91c1c; }
+          
+          .summary-box .amount {
+            font-size: 14px;
+            font-weight: 700;
+            margin: 0;
+            color: #111827;
+          }
+          
+          .transactions-section {
+            margin-top: 30px;
+          }
+          
+          .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            background: #f3f4f6;
+            border-left: 4px solid #3b82f6;
+          }
+          
           .transactions-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
-            font-size: 12px;
-          }
-          .transactions-table th,
-          .transactions-table td {
-            border: 1px solid #000;
-            padding: 5px;
-            text-align: left;
-          }
-          .transactions-table th {
-            background-color: #f0f0f0;
-            font-weight: bold;
+            font-size: 10px;
+            margin-top: 10px;
           }
           
-          /* Footer */
+          .transactions-table th {
+            background: #f8fafc;
+            border: 1px solid #d1d5db;
+            padding: 8px 6px;
+            text-align: left;
+            font-weight: 600;
+            color: #374151;
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+          }
+          
+          .transactions-table td {
+            border: 1px solid #e5e7eb;
+            padding: 6px;
+            font-size: 9px;
+            color: #4b5563;
+          }
+          
+          .transactions-table tr:nth-child(even) {
+            background: #f9fafb;
+          }
+          
+          .transactions-table .amount-cell {
+            text-align: right;
+            font-weight: 500;
+          }
+          
+          .transactions-table .income-row {
+            border-left: 3px solid #10b981;
+          }
+          
+          .transactions-table .expense-row {
+            border-left: 3px solid #ef4444;
+          }
+          
+          .transactions-table .transfer-row {
+            border-left: 3px solid #6366f1;
+          }
+          
           .print-footer {
             text-align: center;
-            margin-top: 20px;
-            font-size: 10px;
-            color: #555;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+            font-size: 9px;
+            color: #6b7280;
           }
           
-          /* Hide screen-only elements */
           .screen-only {
             display: none !important;
           }
@@ -154,100 +238,322 @@ export default function StatementOfAccountPrint({
           .print-only {
             display: none;
           }
+          
           .print-container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 40px 20px;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+          }
+          
+          .statement-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            transition: all 0.3s ease;
+          }
+          
+          .statement-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 32px 64px -12px rgba(0, 0, 0, 0.35);
+          }
+          
+          .print-header {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            color: white;
+            text-align: center;
+            padding: 40px 30px;
+            position: relative;
+            overflow: hidden;
+          }
+          
+          .print-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: shimmer 3s ease-in-out infinite;
+          }
+          
+          @keyframes shimmer {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(180deg); }
+          }
+          
+          .print-header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin: 0 0 12px 0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 1;
+          }
+          
+          .print-header h2 {
+            font-size: 20px;
+            font-weight: 500;
+            margin: 0 0 20px 0;
+            opacity: 0.95;
+            position: relative;
+            z-index: 1;
+          }
+          
+          .print-header .meta-info {
+            font-size: 14px;
+            opacity: 0.9;
+            margin: 8px 0;
+            position: relative;
+            z-index: 1;
+          }
+          
+          .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 30px;
+            background: #f8fafc;
+          }
+          
+          .summary-box {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+          }
+          
+          .summary-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            transition: all 0.3s ease;
+          }
+          
+          .summary-box:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px -4px rgba(0, 0, 0, 0.15);
+          }
+          
+          .summary-box.total-balance::before { background: linear-gradient(90deg, #3b82f6, #1d4ed8); }
+          .summary-box.net-income::before { background: linear-gradient(90deg, #10b981, #047857); }
+          .summary-box.total-income::before { background: linear-gradient(90deg, #059669, #065f46); }
+          .summary-box.total-expenses::before { background: linear-gradient(90deg, #ef4444, #dc2626); }
+          
+          .summary-box h3 {
+            font-weight: 600;
+            font-size: 14px;
+            margin: 0 0 12px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #6b7280;
+          }
+          
+          .summary-box .amount {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0;
+            color: #111827;
+          }
+          
+          .transactions-section {
+            padding: 30px;
+          }
+          
+          .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 20px;
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+            border-radius: 8px;
+            border-left: 5px solid #3b82f6;
+          }
+          
+          .transactions-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+          }
+          
+          .transactions-table th {
+            background: linear-gradient(135deg, #374151, #4b5563);
+            color: white;
+            padding: 16px 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          }
+          
+          .transactions-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+            transition: background-color 0.2s ease;
+          }
+          
+          .transactions-table tr:hover td {
+            background: #f8fafc;
+          }
+          
+          .transactions-table .amount-cell {
+            text-align: right;
+            font-weight: 600;
+          }
+          
+          .transactions-table .income-row {
+            border-left: 4px solid #10b981;
+          }
+          
+          .transactions-table .expense-row {
+            border-left: 4px solid #ef4444;
+          }
+          
+          .transactions-table .transfer-row {
+            border-left: 4px solid #6366f1;
+          }
+          
+          .print-footer {
+            text-align: center;
+            padding: 30px;
+            background: #f8fafc;
+            color: #6b7280;
+            font-size: 12px;
+          }
+          
+          .print-button {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.4);
+          }
+          
+          .print-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px 0 rgba(59, 130, 246, 0.5);
+          }
+          
+          .print-button:active {
+            transform: translateY(0);
           }
         }
       `}</style>
 
       {/* Main print container */}
       <div className="print-container">
-        {/* Header section - matches the image exactly */}
-        <div className="print-header">
-          <h1>CHURCH OF CHRIST, KAGINI</h1>
-          <h2>STATEMENT OF ACCOUNT</h2>
-          <p>Period: {dateRange.label}</p>
-        </div>
-
-        {/* Summary section - matches the image layout */}
-        <div className="summary-grid">
-          <div className="summary-box">
-            <h3>TOTAL BAL</h3>
-            <p>{formatCurrency(totalBalance)}</p>
+        <div className="statement-card">
+          {/* Header section */}
+          <div className="print-header">
+            <h1>CHURCH OF CHRIST, KAGINI</h1>
+            <h2>STATEMENT OF ACCOUNT</h2>
+            <div className="meta-info">Period: {dateRange.label}</div>
+            <div className="meta-info">Generated on: {format(new Date(), 'MMMM dd, yyyy')}</div>
           </div>
-          <div className="summary-box">
-            <h3>NET INCOME</h3>
-            <p>{formatCurrency(netIncome)}</p>
-          </div>
-          <div className="summary-box">
-            <h3>TOTAL INCOME</h3>
-            <p>{formatCurrency(totalIncome)}</p>
-          </div>
-          <div className="summary-box">
-            <h3>TOTAL EXPENSES</h3>
-            <p>{formatCurrency(totalExpenses)}</p>
-          </div>
-        </div>
 
-        {/* Transactions table */}
-        <div>
-          <table className="transactions-table">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Description</th>
-                <th>Account</th>
-                <th>Category</th>
-                <th>Type</th>
-                <th>Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sortedTransactions.map((transaction) => {
-                const account = accounts.find(acc => acc.id === transaction.account_id);
-                const category = categories.find(cat => cat.id === transaction.category_id);
-                const targetAccount = accounts.find(acc => acc.id === transaction.target_account_id);
-                
-                let description = transaction.description || 'Transaction';
-                if (transaction.type === 'transfer') {
-                  description = `Transfer: ${account?.name} → ${targetAccount?.name}`;
-                }
+          {/* Summary section */}
+          <div className="summary-grid">
+            <div className="summary-box total-balance">
+              <h3>Total Balance</h3>
+              <div className="amount">{formatCurrency(totalBalance)}</div>
+            </div>
+            <div className="summary-box net-income">
+              <h3>Net Income</h3>
+              <div className="amount">{formatCurrency(netIncome)}</div>
+            </div>
+            <div className="summary-box total-income">
+              <h3>Total Income</h3>
+              <div className="amount">{formatCurrency(totalIncome)}</div>
+            </div>
+            <div className="summary-box total-expenses">
+              <h3>Total Expenses</h3>
+              <div className="amount">{formatCurrency(totalExpenses)}</div>
+            </div>
+          </div>
 
-                return (
-                  <tr key={transaction.id}>
-                    <td>{format(new Date(transaction.date), 'MMM dd, yyyy')}</td>
-                    <td>{description}</td>
-                    <td>{account?.name || 'Unknown Account'}</td>
-                    <td>
-                      {transaction.type === 'transfer' ? 'Transfer' : (category?.name || 'Uncategorized')}
-                    </td>
-                    <td className="capitalize">{transaction.type}</td>
-                    <td className="text-right">
-                      {transaction.type === 'expense' ? 
-                        `-${formatCurrency(Math.abs(transaction.amount))}` : 
-                        formatCurrency(Math.abs(transaction.amount))
-                      }
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+          {/* Transactions section */}
+          <div className="transactions-section">
+            <div className="section-title">Detailed Transactions</div>
+            <table className="transactions-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Description</th>
+                  <th>Account</th>
+                  <th>Category</th>
+                  <th>Type</th>
+                  <th>Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                {sortedTransactions.map((transaction) => {
+                  const account = accounts.find(acc => acc.id === transaction.account_id);
+                  const category = categories.find(cat => cat.id === transaction.category_id);
+                  const targetAccount = accounts.find(acc => acc.id === transaction.target_account_id);
+                  
+                  let description = transaction.description || 'Transaction';
+                  if (transaction.type === 'transfer') {
+                    description = `Transfer: ${account?.name} → ${targetAccount?.name}`;
+                  }
 
-        {/* Footer */}
-        <div className="print-footer">
-          <p>Generated by CoCKFin Financial Management System</p>
-          <p>This is a computer-generated document and does not require a signature.</p>
+                  const rowClass = transaction.type === 'income' ? 'income-row' : 
+                                 transaction.type === 'expense' ? 'expense-row' : 'transfer-row';
+
+                  return (
+                    <tr key={transaction.id} className={rowClass}>
+                      <td>{format(new Date(transaction.date), 'MMM dd, yyyy')}</td>
+                      <td>{description}</td>
+                      <td>{account?.name || 'Unknown Account'}</td>
+                      <td>
+                        {transaction.type === 'transfer' ? 'Transfer' : (category?.name || 'Uncategorized')}
+                      </td>
+                      <td style={{ textTransform: 'capitalize' }}>{transaction.type}</td>
+                      <td className="amount-cell">
+                        {transaction.type === 'expense' ? 
+                          `-${formatCurrency(Math.abs(transaction.amount))}` : 
+                          formatCurrency(Math.abs(transaction.amount))
+                        }
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Footer */}
+          <div className="print-footer">
+            <p>Generated by ChurchTrack Financial Management System</p>
+            <p>This is a computer-generated document and does not require a signature.</p>
+          </div>
         </div>
 
         {/* Print button (screen only) */}
-        <div className="screen-only mt-8 text-center">
+        <div className="screen-only" style={{ textAlign: 'center', marginTop: '30px' }}>
           <button
             onClick={() => window.print()}
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+            className="print-button"
           >
             Print Statement
           </button>
@@ -256,3 +562,4 @@ export default function StatementOfAccountPrint({
     </>
   );
 }
+
