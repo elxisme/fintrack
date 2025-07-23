@@ -63,6 +63,11 @@ export default function StatementOfAccountPrint({
             box-sizing: border-box;
           }
           
+          @page {
+            margin: 15mm;
+            size: A4;
+          }
+          
           body {
             margin: 0;
             padding: 0;
@@ -71,6 +76,7 @@ export default function StatementOfAccountPrint({
             background: white;
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
+            line-height: 1.4;
           }
           
           body * {
@@ -86,7 +92,7 @@ export default function StatementOfAccountPrint({
             width: 100% !important;
             max-width: none !important;
             margin: 0 !important;
-            padding: 15mm !important;
+            padding: 0 !important;
             background: white !important;
             box-shadow: none !important;
             border-radius: 0 !important;
@@ -204,6 +210,7 @@ export default function StatementOfAccountPrint({
           
           .transactions-section {
             margin-top: 20px;
+            page-break-inside: auto;
           }
           
           .section-title {
@@ -215,6 +222,7 @@ export default function StatementOfAccountPrint({
             background: #f3f4f6 !important;
             border-left: 3px solid #3b82f6;
             page-break-after: avoid;
+            page-break-inside: avoid;
           }
           
           .transactions-table {
@@ -223,6 +231,11 @@ export default function StatementOfAccountPrint({
             font-size: 8px;
             margin-top: 5px;
             page-break-inside: auto;
+            table-layout: fixed;
+          }
+          
+          .transactions-table thead {
+            display: table-header-group;
           }
           
           .transactions-table th {
@@ -235,19 +248,24 @@ export default function StatementOfAccountPrint({
             font-size: 7px;
             text-transform: uppercase;
             letter-spacing: 0.2px;
-          }
-          
-          .transactions-table thead {
-            display: table-header-group;
+            page-break-after: avoid;
+            page-break-inside: avoid;
           }
           
           .transactions-table tbody {
             display: table-row-group;
           }
           
-          .transactions-table tr {
+          .transactions-table tbody tr {
             page-break-inside: avoid;
+            break-inside: avoid;
             page-break-after: auto;
+            orphans: 2;
+            widows: 2;
+          }
+          
+          .transactions-table tbody tr:nth-child(25n) {
+            page-break-after: page;
           }
           
           .transactions-table td {
@@ -255,6 +273,9 @@ export default function StatementOfAccountPrint({
             padding: 4px;
             font-size: 7px;
             color: #4b5563 !important;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
           }
           
           .transactions-table tr:nth-child(even) {
@@ -278,6 +299,20 @@ export default function StatementOfAccountPrint({
             border-left: 2px solid #6366f1;
           }
           
+          /* Column widths for better layout */
+          .transactions-table th:nth-child(1),
+          .transactions-table td:nth-child(1) { width: 12%; }
+          .transactions-table th:nth-child(2),
+          .transactions-table td:nth-child(2) { width: 25%; }
+          .transactions-table th:nth-child(3),
+          .transactions-table td:nth-child(3) { width: 18%; }
+          .transactions-table th:nth-child(4),
+          .transactions-table td:nth-child(4) { width: 18%; }
+          .transactions-table th:nth-child(5),
+          .transactions-table td:nth-child(5) { width: 12%; }
+          .transactions-table th:nth-child(6),
+          .transactions-table td:nth-child(6) { width: 15%; }
+          
           .print-footer {
             text-align: center;
             margin-top: 20px;
@@ -286,10 +321,22 @@ export default function StatementOfAccountPrint({
             font-size: 8px;
             color: #6b7280 !important;
             page-break-inside: avoid;
+            page-break-before: avoid;
           }
           
           .screen-only {
             display: none !important;
+          }
+          
+          /* Ensure proper page breaks for long tables */
+          .transactions-table-wrapper {
+            page-break-inside: auto;
+            overflow: visible;
+          }
+          
+          /* Force break after every 20-25 rows to prevent overflow */
+          .page-break-row {
+            page-break-after: page;
           }
         }
         
@@ -442,13 +489,17 @@ export default function StatementOfAccountPrint({
             border-left: 5px solid #3b82f6;
           }
           
+          .transactions-table-wrapper {
+            overflow-x: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+          }
+          
           .transactions-table {
             width: 100%;
             border-collapse: collapse;
             font-size: 14px;
-            border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
           }
           
           .transactions-table th {
@@ -555,51 +606,57 @@ export default function StatementOfAccountPrint({
           {/* Transactions section */}
           <div className="transactions-section">
             <div className="section-title">Detailed Transactions</div>
-            <table className="transactions-table">
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Description</th>
-                  <th>Account</th>
-                  <th>Category</th>
-                  <th>Type</th>
-                  <th>Amount</th>
-                </tr>
-              </thead>
-              <tbody>
-                {sortedTransactions.map((transaction) => {
-                  const account = accounts.find(acc => acc.id === transaction.account_id);
-                  const category = categories.find(cat => cat.id === transaction.category_id);
-                  const targetAccount = accounts.find(acc => acc.id === transaction.target_account_id);
-                  
-                  let description = transaction.description || 'Transaction';
-                  if (transaction.type === 'transfer') {
-                    description = `Transfer: ${account?.name} → ${targetAccount?.name}`;
-                  }
+            <div className="transactions-table-wrapper">
+              <table className="transactions-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Description</th>
+                    <th>Account</th>
+                    <th>Category</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sortedTransactions.map((transaction, index) => {
+                    const account = accounts.find(acc => acc.id === transaction.account_id);
+                    const category = categories.find(cat => cat.id === transaction.category_id);
+                    const targetAccount = accounts.find(acc => acc.id === transaction.target_account_id);
+                    
+                    let description = transaction.description || 'Transaction';
+                    if (transaction.type === 'transfer') {
+                      description = `Transfer: ${account?.name} → ${targetAccount?.name}`;
+                    }
 
-                  const rowClass = transaction.type === 'income' ? 'income-row' : 
-                                 transaction.type === 'expense' ? 'expense-row' : 'transfer-row';
+                    const rowClass = transaction.type === 'income' ? 'income-row' : 
+                                   transaction.type === 'expense' ? 'expense-row' : 'transfer-row';
 
-                  return (
-                    <tr key={transaction.id} className={rowClass}>
-                      <td>{format(new Date(transaction.date), 'MMM dd, yyyy')}</td>
-                      <td>{description}</td>
-                      <td>{account?.name || 'Unknown Account'}</td>
-                      <td>
-                        {transaction.type === 'transfer' ? 'Transfer' : (category?.name || 'Uncategorized')}
-                      </td>
-                      <td style={{ textTransform: 'capitalize' }}>{transaction.type}</td>
-                      <td className="amount-cell">
-                        {transaction.type === 'expense' ? 
-                          `-${formatCurrency(Math.abs(transaction.amount))}` : 
-                          formatCurrency(Math.abs(transaction.amount))
-                        }
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                    // Add page break class every 25 rows for print
+                    const shouldBreak = (index + 1) % 25 === 0 && index !== sortedTransactions.length - 1;
+                    const finalRowClass = shouldBreak ? `${rowClass} page-break-row` : rowClass;
+
+                    return (
+                      <tr key={transaction.id} className={finalRowClass}>
+                        <td>{format(new Date(transaction.date), 'MMM dd, yyyy')}</td>
+                        <td>{description}</td>
+                        <td>{account?.name || 'Unknown Account'}</td>
+                        <td>
+                          {transaction.type === 'transfer' ? 'Transfer' : (category?.name || 'Uncategorized')}
+                        </td>
+                        <td style={{ textTransform: 'capitalize' }}>{transaction.type}</td>
+                        <td className="amount-cell">
+                          {transaction.type === 'expense' ? 
+                            `-${formatCurrency(Math.abs(transaction.amount))}` : 
+                            formatCurrency(Math.abs(transaction.amount))
+                          }
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
 
           {/* Footer */}
