@@ -89,32 +89,10 @@ export default function StatementOfAccountPrint({
     new Date(a.date).getTime() - new Date(b.date).getTime()
   );
 
-  // Group transactions for pagination (20 rows per page)
-  const ROWS_PER_PAGE = 20;
-  const transactionPages = [];
-  for (let i = 0; i < sortedTransactions.length; i += ROWS_PER_PAGE) {
-    transactionPages.push(sortedTransactions.slice(i, i + ROWS_PER_PAGE));
-  }
-
-  // Table header component for reuse
-  const TableHeader = () => (
-    <thead>
-      <tr className="bg-gray-100">
-        <th className="border border-gray-400 p-2 text-left font-semibold">Date</th>
-        <th className="border border-gray-400 p-2 text-left font-semibold">Description</th>
-        <th className="border border-gray-400 p-2 text-left font-semibold">Account</th>
-        <th className="border border-gray-400 p-2 text-left font-semibold">Category</th>
-        <th className="border border-gray-400 p-2 text-left font-semibold">Type</th>
-        <th className="border border-gray-400 p-2 text-right font-semibold">Amount</th>
-      </tr>
-    </thead>
-  );
-
   return (
     <>
       <style jsx global>{`
         @media print {
-          /* Basic print setup */
           body * {
             visibility: hidden;
           }
@@ -133,93 +111,12 @@ export default function StatementOfAccountPrint({
           .no-print {
             display: none !important;
           }
-
-          /* Page break controls - Cross-browser compatibility */
-          .page-break-before {
-            page-break-before: always;
-            break-before: page;
-          }
-          
-          .page-break-after {
-            page-break-after: always;
-            break-after: page;
-          }
-          
-          .page-break-inside-avoid {
-            page-break-inside: avoid;
-            break-inside: avoid;
-          }
-          
-          .page-break-inside-auto {
-            page-break-inside: auto;
-            break-inside: auto;
-          }
-
-          /* Keep summary sections together */
-          .summary-section {
-            page-break-inside: avoid;
-            break-inside: avoid;
-          }
-
-          /* Table specific page breaks */
-          .transaction-table {
-            page-break-inside: auto;
-            break-inside: auto;
-          }
-          
-          .transaction-table thead {
-            display: table-header-group;
-          }
-          
-          .transaction-table tbody {
-            display: table-row-group;
-          }
-          
-          .transaction-table tr {
-            page-break-inside: avoid;
-            break-inside: avoid;
-          }
-
-          /* Ensure table headers repeat on each page */
-          .table-page {
-            page-break-after: always;
-            break-after: page;
-          }
-          
-          .table-page:last-child {
-            page-break-after: auto;
-            break-after: auto;
-          }
-
-          /* Footer positioning */
-          .print-footer {
-            page-break-inside: avoid;
-            break-inside: avoid;
-          }
-
-          /* Prevent orphaned content */
-          h1, h2, h3, h4, h5, h6 {
-            page-break-after: avoid;
-            break-after: avoid;
-          }
-
-          /* Ensure minimum content on page */
-          .content-section {
-            orphans: 3;
-            widows: 3;
-          }
-
-          /* Page margins for better printing */
-          @page {
-            margin: 0.5in;
-            size: A4;
-          }
         }
       `}</style>
 
       <div className="print-modal-content max-w-4xl mx-auto p-8 bg-white text-black">
-        {/* Header - Keep together */}
-        <div className="text-center mb-8 border-b-2 border-gray-800 pb-6 page-break-inside-avoid">
+        {/* Header */}
+        <div className="text-center mb-8 border-b-2 border-gray-800 pb-6">
           <h1 className="text-3xl font-bold mb-2">CHURCH OF CHRIST, KAGINI</h1>
           <h2 className="text-xl font-semibold mb-4">STATEMENT OF ACCOUNT</h2>
           <div className="text-sm">
@@ -228,104 +125,94 @@ export default function StatementOfAccountPrint({
           </div>
         </div>
 
-        {/* Summary Section - Keep together */}
-        <div className="summary-section mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-            {/* Total Current Balance */}
-            <div>
-              <div className="bg-blue-100 border-2 border-blue-400 p-6 text-center">
-                <h3 className="text-xl font-bold text-blue-800 mb-2">TOT. BALANCE: {formatCurrency(totalBalance)}</h3>
-              </div>
-            </div>
-
-            {/* Net Income */}
-            <div>
-              <div className={`text-center p-6 border-2 ${netIncome >= 0 ? 'bg-green-100 border-green-400' : 'bg-red-100 border-red-400'}`}>
-                <h3 className="text-xl font-bold">
-                  NET INCOME: {formatCurrency(netIncome)}
-                </h3>
-              </div>
+        {/* Summary Section */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+          {/* Total Current Balance */}
+          <div>
+            <div className="bg-blue-100 border-2 border-blue-400 p-6 text-center">
+              <h3 className="text-xl font-bold text-blue-800 mb-2">TOT. BALANCE: {formatCurrency(totalBalance)}</h3>
+              
             </div>
           </div>
 
-          {/* Income and Expense Summaries */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Income Summary */}
-            <div>
-              <div className="bg-green-100 border-2 border-green-400 p-6 text-center">
-                <h3 className="text-xl font-bold text-green-800 mb-2">TOTAL INCOME: {formatCurrency(totalIncome)}</h3>
-              </div>
-            </div>
-
-            {/* Expense Summary */}
-            <div>
-              <div className="bg-red-100 border-2 border-red-400 p-6 text-center">
-                <h3 className="text-xl font-bold text-red-800 mb-2">TOTAL EXPENSES: {formatCurrency(totalExpenses)}</h3>
-              </div>
+          {/* Net Income */}
+          <div>
+            <div className={`text-center p-6 border-2 ${netIncome >= 0 ? 'bg-green-100 border-green-400' : 'bg-red-100 border-red-400'}`}>
+              <h3 className="text-xl font-bold">
+                NET INCOME: {formatCurrency(netIncome)}
+              </h3>
             </div>
           </div>
         </div>
 
-        {/* Detailed Transactions - Start on new page if needed */}
-        <div className="page-break-before">
+        {/* Income and Expense Summaries */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+          {/* Income Summary */}
+          <div>
+            <div className="bg-green-100 border-2 border-green-400 p-6 text-center">
+              <h3 className="text-xl font-bold text-green-800 mb-2">TOTAL INCOME: {formatCurrency(totalIncome)}</h3>
+              
+            </div>
+          </div>
+
+          {/* Expense Summary */}
+          <div>
+            <div className="bg-red-100 border-2 border-red-400 p-6 text-center">
+              <h3 className="text-xl font-bold text-red-800 mb-2">TOTAL EXPENSES: {formatCurrency(totalExpenses)}</h3>
+              
+            </div>
+          </div>
+        </div>
+
+        {/* Detailed Transactions */}
+        <div>
           <h3 className="text-lg font-bold mb-4 bg-blue-100 p-2 border border-gray-400">DETAILED TRANSACTIONS</h3>
-          
-          {/* Render transaction tables with pagination */}
-          {transactionPages.map((pageTransactions, pageIndex) => (
-            <div key={pageIndex} className={`table-page ${pageIndex === transactionPages.length - 1 ? '' : 'page-break-after'}`}>
-              {pageIndex > 0 && (
-                <div className="mb-4">
-                  <h4 className="text-md font-semibold text-gray-600">
-                    Detailed Transactions (Continued) - Page {pageIndex + 1}
-                  </h4>
-                </div>
-              )}
-              
-              <table className="w-full border-collapse border border-gray-400 text-sm transaction-table">
-                <TableHeader />
-                <tbody>
-                  {pageTransactions.map((transaction) => {
-                    const account = accounts.find(acc => acc.id === transaction.account_id);
-                    const category = categories.find(cat => cat.id === transaction.category_id);
-                    const targetAccount = accounts.find(acc => acc.id === transaction.target_account_id);
-                    
-                    let description = transaction.description || 'Transaction';
-                    if (transaction.type === 'transfer') {
-                      description = `Transfer: ${account?.name} → ${targetAccount?.name}`;
-                    }
+          <table className="w-full border-collapse border border-gray-400 text-sm">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="border border-gray-400 p-2 text-left font-semibold">Date</th>
+                <th className="border border-gray-400 p-2 text-left font-semibold">Description</th>
+                <th className="border border-gray-400 p-2 text-left font-semibold">Account</th>
+                <th className="border border-gray-400 p-2 text-left font-semibold">Category</th>
+                <th className="border border-gray-400 p-2 text-left font-semibold">Type</th>
+                <th className="border border-gray-400 p-2 text-right font-semibold">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              {sortedTransactions.map((transaction) => {
+                const account = accounts.find(acc => acc.id === transaction.account_id);
+                const category = categories.find(cat => cat.id === transaction.category_id);
+                const targetAccount = accounts.find(acc => acc.id === transaction.target_account_id);
+                
+                let description = transaction.description || 'Transaction';
+                if (transaction.type === 'transfer') {
+                  description = `Transfer: ${account?.name} → ${targetAccount?.name}`;
+                }
 
-                    return (
-                      <tr key={transaction.id} className={transaction.type === 'income' ? 'bg-green-25' : transaction.type === 'expense' ? 'bg-red-25' : 'bg-blue-25'}>
-                        <td className="border border-gray-400 p-2">{format(new Date(transaction.date), 'MMM dd, yyyy')}</td>
-                        <td className="border border-gray-400 p-2">{description}</td>
-                        <td className="border border-gray-400 p-2">{account?.name || 'Unknown Account'}</td>
-                        <td className="border border-gray-400 p-2">
-                          {transaction.type === 'transfer' ? 'Transfer' : (category?.name || 'Uncategorized')}
-                        </td>
-                        <td className="border border-gray-400 p-2 capitalize">{transaction.type}</td>
-                        <td className="border border-gray-400 p-2 text-right">
-                          {transaction.type === 'expense' ? 
-                            `-${formatCurrency(Math.abs(transaction.amount))}` : 
-                            formatCurrency(Math.abs(transaction.amount))
-                          }
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-              
-              {pageIndex < transactionPages.length - 1 && (
-                <div className="text-center mt-4 text-sm text-gray-600">
-                  <p>Continued on next page...</p>
-                </div>
-              )}
-            </div>
-          ))}
+                return (
+                  <tr key={transaction.id} className={transaction.type === 'income' ? 'bg-green-25' : transaction.type === 'expense' ? 'bg-red-25' : 'bg-blue-25'}>
+                    <td className="border border-gray-400 p-2">{format(new Date(transaction.date), 'MMM dd, yyyy')}</td>
+                    <td className="border border-gray-400 p-2">{description}</td>
+                    <td className="border border-gray-400 p-2">{account?.name || 'Unknown Account'}</td>
+                    <td className="border border-gray-400 p-2">
+                      {transaction.type === 'transfer' ? 'Transfer' : (category?.name || 'Uncategorized')}
+                    </td>
+                    <td className="border border-gray-400 p-2 capitalize">{transaction.type}</td>
+                    <td className="border border-gray-400 p-2 text-right">
+                      {transaction.type === 'expense' ? 
+                        `-${formatCurrency(Math.abs(transaction.amount))}` : 
+                        formatCurrency(Math.abs(transaction.amount))
+                      }
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
 
-        {/* Footer - Keep together and start on new page if needed */}
-        <div className="print-footer page-break-before mt-8 pt-4 border-t border-gray-400 text-center text-sm text-gray-600">
+        {/* Footer */}
+        <div className="mt-8 pt-4 border-t border-gray-400 text-center text-sm text-gray-600">
           <p>Generated by ChurchTrack Financial Management System</p>
           <p>This is a computer-generated document and does not require a signature.</p>
         </div>
@@ -343,4 +230,3 @@ export default function StatementOfAccountPrint({
     </>
   );
 }
-
