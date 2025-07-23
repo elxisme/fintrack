@@ -1,6 +1,7 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { format } from 'date-fns';
 import { Transaction, Account, Category } from '../../lib/offline-storage';
+import './print-styles.css'; // Import the external print CSS
 
 interface StatementOfAccountPrintProps {
   transactions: Transaction[];
@@ -21,114 +22,6 @@ export default function StatementOfAccountPrint({
   dateRange,
   exchangeRate
 }: StatementOfAccountPrintProps) {
-  
-  // Inject print styles directly into the document head
-  useEffect(() => {
-    const printStyles = `
-      @media print {
-        @page {
-          size: A4;
-          margin: 0.5in;
-        }
-        
-        body * {
-          visibility: hidden;
-        }
-        
-        .statement-print-container,
-        .statement-print-container * {
-          visibility: visible !important;
-        }
-        
-        .statement-print-container {
-          position: absolute !important;
-          left: 0 !important;
-          top: 0 !important;
-          width: 100% !important;
-          margin: 0 !important;
-          padding: 0 !important;
-          background: white !important;
-          font-family: Arial, sans-serif !important;
-          font-size: 12pt !important;
-          line-height: 1.4 !important;
-        }
-        
-        .no-print {
-          display: none !important;
-        }
-        
-        .print-page-break {
-          page-break-before: always !important;
-          break-before: page !important;
-        }
-        
-        .print-avoid-break {
-          page-break-inside: avoid !important;
-          break-inside: avoid !important;
-        }
-        
-        .print-table {
-          width: 100% !important;
-          border-collapse: collapse !important;
-          font-size: 10pt !important;
-        }
-        
-        .print-table thead {
-          display: table-header-group !important;
-        }
-        
-        .print-table th,
-        .print-table td {
-          border: 1pt solid #000 !important;
-          padding: 4pt !important;
-          text-align: left !important;
-        }
-        
-        .print-table th {
-          background: #f0f0f0 !important;
-          font-weight: bold !important;
-        }
-        
-        .print-table tr {
-          page-break-inside: avoid !important;
-          break-inside: avoid !important;
-        }
-        
-        .print-summary-box {
-          border: 2pt solid #000 !important;
-          padding: 8pt !important;
-          margin: 4pt !important;
-          text-align: center !important;
-          background: #f8f8f8 !important;
-        }
-        
-        .print-header {
-          text-align: center !important;
-          margin-bottom: 20pt !important;
-          page-break-inside: avoid !important;
-          break-inside: avoid !important;
-        }
-        
-        .print-footer {
-          page-break-before: always !important;
-          break-before: page !important;
-          text-align: center !important;
-          font-size: 10pt !important;
-          border-top: 1pt solid #000 !important;
-          padding-top: 10pt !important;
-        }
-      }
-    `;
-    
-    const styleElement = document.createElement('style');
-    styleElement.textContent = printStyles;
-    document.head.appendChild(styleElement);
-    
-    return () => {
-      document.head.removeChild(styleElement);
-    };
-  }, []);
-
   // Format currency helper
   const formatCurrency = (amount: number) => {
     if (exchangeRate) {
@@ -141,10 +34,15 @@ export default function StatementOfAccountPrint({
     return `₦${new Intl.NumberFormat('en-NG').format(amount)}`;
   };
 
-  // Calculate totals
-  const totalBalance = accounts.reduce((sum, account) => sum + account.current_balance, 0);
+  // Calculate total balance from all accounts
+  const totalBalance = accounts.reduce((sum, account) => {
+    return sum + account.current_balance;
+  }, 0);
+
+  // Calculate summaries
   const incomeTransactions = transactions.filter(t => t.type === 'income');
   const expenseTransactions = transactions.filter(t => t.type === 'expense');
+  
   const totalIncome = incomeTransactions.reduce((sum, t) => sum + t.amount, 0);
   const totalExpenses = expenseTransactions.reduce((sum, t) => sum + t.amount, 0);
   const netIncome = totalIncome - totalExpenses;
@@ -154,156 +52,122 @@ export default function StatementOfAccountPrint({
     new Date(a.date).getTime() - new Date(b.date).getTime()
   );
 
-  // Split transactions into chunks of 25 for better page breaks
-  const TRANSACTIONS_PER_PAGE = 25;
-  const transactionChunks = [];
-  for (let i = 0; i < sortedTransactions.length; i += TRANSACTIONS_PER_PAGE) {
-    transactionChunks.push(sortedTransactions.slice(i, i + TRANSACTIONS_PER_PAGE));
-  }
+  // Helper function to get account name
+  const getAccountName = (accountId: string) => {
+    return accounts.find(acc => acc.id === accountId)?.name || 'Unknown Account';
+  };
+
+  // Helper function to get category name
+  const getCategoryName = (categoryId: string | null, transactionType: string) => {
+    if (transactionType === 'transfer') return 'Transfer';
+    if (!categoryId) return 'Uncategorized';
+    return categories.find(cat => cat.id === categoryId)?.name || 'Uncategorized';
+  };
+
+  // Helper function to get transaction description
+  const getTransactionDescription = (transaction: Transaction) => {
+    if (transaction.type === 'transfer') {
+      const sourceAccount = getAccountName(transaction.account_id);
+      const targetAccount = getAccountName(transaction.target_account_id || '');
+      return `Transfer: ${sourceAccount} → ${targetAccount}`;
+    }
+    return transaction.description || 'Transaction';
+  };
 
   return (
-    <div className="statement-print-container">
-      {/* Header */}
-      <div className="print-header print-avoid-break">
-        <h1 style={{ fontSize: '18pt', fontWeight: 'bold', margin: '0 0 10pt 0' }}>
-          CHURCH OF CHRIST, KAGINI
-        </h1>
-        <h2 style={{ fontSize: '14pt', fontWeight: 'bold', margin: '0 0 15pt 0' }}>
-          STATEMENT OF ACCOUNT
-        </h2>
-        <div style={{ fontSize: '11pt' }}>
-          <p style={{ margin: '5pt 0' }}><strong>Period:</strong> {dateRange.label}</p>
-          <p style={{ margin: '5pt 0' }}><strong>Generated on:</strong> {format(new Date(), 'MMMM dd, yyyy')}</p>
+    <div className="print-content">
+      {/* Header Section */}
+      <div className="print-header">
+        <h1>CHURCH OF CHRIST, KAGINI</h1>
+        <h2>STATEMENT OF ACCOUNT</h2>
+        <div>
+          <p><strong>Period:</strong> {dateRange.label}</p>
+          <p><strong>Generated on:</strong> {format(new Date(), 'MMMM dd, yyyy')}</p>
         </div>
       </div>
 
       {/* Summary Section */}
-      <div className="print-avoid-break" style={{ marginBottom: '20pt' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10pt', marginBottom: '10pt' }}>
-          <div className="print-summary-box">
-            <h3 style={{ fontSize: '12pt', fontWeight: 'bold', margin: '0' }}>
-              TOTAL BALANCE: {formatCurrency(totalBalance)}
-            </h3>
+      <div className="summary-grid">
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10pt', marginBottom: '15pt' }}>
+          <div className="summary-box">
+            <h3>TOTAL BALANCE: {formatCurrency(totalBalance)}</h3>
           </div>
-          <div className="print-summary-box">
-            <h3 style={{ fontSize: '12pt', fontWeight: 'bold', margin: '0' }}>
-              NET INCOME: {formatCurrency(netIncome)}
-            </h3>
+          <div className="summary-box">
+            <h3>NET INCOME: {formatCurrency(netIncome)}</h3>
           </div>
         </div>
         
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10pt' }}>
-          <div className="print-summary-box">
-            <h3 style={{ fontSize: '12pt', fontWeight: 'bold', margin: '0' }}>
-              TOTAL INCOME: {formatCurrency(totalIncome)}
-            </h3>
+          <div className="summary-box">
+            <h3>TOTAL INCOME: {formatCurrency(totalIncome)}</h3>
           </div>
-          <div className="print-summary-box">
-            <h3 style={{ fontSize: '12pt', fontWeight: 'bold', margin: '0' }}>
-              TOTAL EXPENSES: {formatCurrency(totalExpenses)}
-            </h3>
+          <div className="summary-box">
+            <h3>TOTAL EXPENSES: {formatCurrency(totalExpenses)}</h3>
           </div>
         </div>
       </div>
 
-      {/* Transactions */}
-      <div className="print-page-break">
-        <h3 style={{ 
-          fontSize: '14pt', 
-          fontWeight: 'bold', 
-          background: '#f0f0f0', 
-          padding: '8pt', 
-          border: '1pt solid #000', 
-          margin: '0 0 10pt 0' 
-        }}>
-          DETAILED TRANSACTIONS
-        </h3>
+      {/* Transactions Section */}
+      <div className="transactions-section">
+        <div className="section-title">DETAILED TRANSACTIONS</div>
         
-        {transactionChunks.map((chunk, chunkIndex) => (
-          <div key={chunkIndex} className={chunkIndex > 0 ? 'print-page-break' : ''}>
-            {chunkIndex > 0 && (
-              <h4 style={{ fontSize: '12pt', color: '#666', marginBottom: '10pt' }}>
-                Detailed Transactions (Continued) - Page {chunkIndex + 1}
-              </h4>
-            )}
-            
-            <table className="print-table">
-              <thead>
-                <tr>
-                  <th style={{ width: '12%' }}>Date</th>
-                  <th style={{ width: '25%' }}>Description</th>
-                  <th style={{ width: '18%' }}>Account</th>
-                  <th style={{ width: '15%' }}>Category</th>
-                  <th style={{ width: '10%' }}>Type</th>
-                  <th style={{ width: '20%', textAlign: 'right' }}>Amount</th>
+        <table className="transactions-table">
+          <thead>
+            <tr>
+              <th style={{ width: '12%' }}>Date</th>
+              <th style={{ width: '25%' }}>Description</th>
+              <th style={{ width: '18%' }}>Account</th>
+              <th style={{ width: '15%' }}>Category</th>
+              <th style={{ width: '10%' }}>Type</th>
+              <th style={{ width: '20%' }}>Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            {sortedTransactions.map((transaction, index) => {
+              const rowClass = transaction.type === 'income' ? 'income-row' : 
+                              transaction.type === 'expense' ? 'expense-row' : '';
+              
+              return (
+                <tr key={transaction.id} className={rowClass}>
+                  <td>{format(new Date(transaction.date), 'MMM dd, yyyy')}</td>
+                  <td>{getTransactionDescription(transaction)}</td>
+                  <td>{getAccountName(transaction.account_id)}</td>
+                  <td>{getCategoryName(transaction.category_id, transaction.type)}</td>
+                  <td style={{ textTransform: 'capitalize' }}>{transaction.type}</td>
+                  <td className="amount-cell">
+                    {transaction.type === 'expense' ? 
+                      `-${formatCurrency(Math.abs(transaction.amount))}` : 
+                      formatCurrency(Math.abs(transaction.amount))
+                    }
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {chunk.map((transaction) => {
-                  const account = accounts.find(acc => acc.id === transaction.account_id);
-                  const category = categories.find(cat => cat.id === transaction.category_id);
-                  const targetAccount = accounts.find(acc => acc.id === transaction.target_account_id);
-                  
-                  let description = transaction.description || 'Transaction';
-                  if (transaction.type === 'transfer') {
-                    description = `Transfer: ${account?.name} → ${targetAccount?.name}`;
-                  }
-
-                  const bgColor = transaction.type === 'income' ? '#f0f8f0' : 
-                                 transaction.type === 'expense' ? '#f8f0f0' : '#f0f0f8';
-
-                  return (
-                    <tr key={transaction.id} style={{ backgroundColor: bgColor }}>
-                      <td>{format(new Date(transaction.date), 'MMM dd, yyyy')}</td>
-                      <td>{description}</td>
-                      <td>{account?.name || 'Unknown Account'}</td>
-                      <td>
-                        {transaction.type === 'transfer' ? 'Transfer' : (category?.name || 'Uncategorized')}
-                      </td>
-                      <td style={{ textTransform: 'capitalize' }}>{transaction.type}</td>
-                      <td style={{ textAlign: 'right' }}>
-                        {transaction.type === 'expense' ? 
-                          `-${formatCurrency(Math.abs(transaction.amount))}` : 
-                          formatCurrency(Math.abs(transaction.amount))
-                        }
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-            
-            {chunkIndex < transactionChunks.length - 1 && (
-              <div style={{ textAlign: 'center', margin: '10pt 0', fontStyle: 'italic', fontSize: '10pt' }}>
-                Continued on next page...
-              </div>
-            )}
-          </div>
-        ))}
+              );
+            })}
+          </tbody>
+        </table>
       </div>
 
       {/* Footer */}
-      <div className="print-footer print-avoid-break">
-        <p style={{ margin: '5pt 0' }}>Generated by ChurchTrack Financial Management System</p>
-        <p style={{ margin: '5pt 0' }}>This is a computer-generated document and does not require a signature.</p>
+      <div className="print-footer">
+        <p>Generated by ChurchTrack Financial Management System</p>
+        <p>This is a computer-generated document and does not require a signature.</p>
       </div>
 
-      {/* Print Button */}
+      {/* Print Button (hidden when printing) */}
       <div className="no-print" style={{ textAlign: 'center', marginTop: '20px' }}>
         <button
           onClick={() => window.print()}
           style={{
             backgroundColor: '#007bff',
             color: 'white',
-            padding: '12px 24px',
+            padding: '10px 20px',
             border: 'none',
             borderRadius: '5px',
             cursor: 'pointer',
-            fontSize: '14px',
-            fontWeight: 'bold'
+            fontSize: '14px'
           }}
         >
-          🖨️ Print Statement
+          Print Statement
         </button>
       </div>
     </div>
