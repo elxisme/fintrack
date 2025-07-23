@@ -259,13 +259,6 @@ export default function StatementOfAccountPrint({
           .transactions-table tbody tr {
             page-break-inside: avoid;
             break-inside: avoid;
-            page-break-after: auto;
-            orphans: 2;
-            widows: 2;
-          }
-          
-          .transactions-table tbody tr:nth-child(25n) {
-            page-break-after: page;
           }
           
           .transactions-table td {
@@ -313,6 +306,22 @@ export default function StatementOfAccountPrint({
           .transactions-table th:nth-child(6),
           .transactions-table td:nth-child(6) { width: 15%; }
           
+          /* Page break row styling */
+          .page-break-row {
+            page-break-after: always;
+            break-after: page;
+            height: 0;
+            visibility: hidden;
+          }
+          
+          /* Empty cell for page break rows */
+          .page-break-row td {
+            padding: 0 !important;
+            border: none !important;
+            line-height: 0;
+            height: 0;
+          }
+          
           .print-footer {
             text-align: center;
             margin-top: 20px;
@@ -332,11 +341,6 @@ export default function StatementOfAccountPrint({
           .transactions-table-wrapper {
             page-break-inside: auto;
             overflow: visible;
-          }
-          
-          /* Force break after every 20-25 rows to prevent overflow */
-          .page-break-row {
-            page-break-after: page;
           }
         }
         
@@ -632,26 +636,29 @@ export default function StatementOfAccountPrint({
                     const rowClass = transaction.type === 'income' ? 'income-row' : 
                                    transaction.type === 'expense' ? 'expense-row' : 'transfer-row';
 
-                    // Add page break class every 25 rows for print
-                    const shouldBreak = (index + 1) % 25 === 0 && index !== sortedTransactions.length - 1;
-                    const finalRowClass = shouldBreak ? `${rowClass} page-break-row` : rowClass;
-
                     return (
-                      <tr key={transaction.id} className={finalRowClass}>
-                        <td>{format(new Date(transaction.date), 'MMM dd, yyyy')}</td>
-                        <td>{description}</td>
-                        <td>{account?.name || 'Unknown Account'}</td>
-                        <td>
-                          {transaction.type === 'transfer' ? 'Transfer' : (category?.name || 'Uncategorized')}
-                        </td>
-                        <td style={{ textTransform: 'capitalize' }}>{transaction.type}</td>
-                        <td className="amount-cell">
-                          {transaction.type === 'expense' ? 
-                            `-${formatCurrency(Math.abs(transaction.amount))}` : 
-                            formatCurrency(Math.abs(transaction.amount))
-                          }
-                        </td>
-                      </tr>
+                      <React.Fragment key={transaction.id}>
+                        <tr className={rowClass}>
+                          <td>{format(new Date(transaction.date), 'MMM dd, yyyy')}</td>
+                          <td>{description}</td>
+                          <td>{account?.name || 'Unknown Account'}</td>
+                          <td>
+                            {transaction.type === 'transfer' ? 'Transfer' : (category?.name || 'Uncategorized')}
+                          </td>
+                          <td style={{ textTransform: 'capitalize' }}>{transaction.type}</td>
+                          <td className="amount-cell">
+                            {transaction.type === 'expense' ? 
+                              `-${formatCurrency(Math.abs(transaction.amount))}` : 
+                              formatCurrency(Math.abs(transaction.amount))
+                            }
+                          </td>
+                        </tr>
+                        {(index + 1) % 25 === 0 && (index !== sortedTransactions.length - 1) && (
+                          <tr className="page-break-row">
+                            <td colSpan={6}></td>
+                          </tr>
+                        )}
+                      </React.Fragment>
                     );
                   })}
                 </tbody>
