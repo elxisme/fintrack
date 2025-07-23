@@ -59,159 +59,206 @@ export default function StatementOfAccountPrint({
         
         /* Print styles */
         @media print {
-          body * {
-            visibility: hidden;
+          * {
+            box-sizing: border-box;
           }
-          .print-container, .print-container * {
-            visibility: visible;
-          }
-          .print-container {
-            position: static;
-            width: 100%;
+          
+          body {
             margin: 0;
-            padding: 20px;
+            padding: 0;
             font-family: 'Inter', Arial, sans-serif;
             color: #1a1a1a;
             background: white;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+          }
+          
+          body * {
+            visibility: hidden;
+          }
+          
+          .print-container, .print-container * {
+            visibility: visible;
+          }
+          
+          .print-container {
+            position: static !important;
+            width: 100% !important;
+            max-width: none !important;
+            margin: 0 !important;
+            padding: 15mm !important;
+            background: white !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            overflow: visible !important;
+          }
+          
+          .statement-card {
+            background: white !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            overflow: visible !important;
+            transform: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
           }
           
           .print-header {
             text-align: center;
-            margin-bottom: 30px;
-            border-bottom: 3px solid #2563eb;
-            padding-bottom: 20px;
-            page-break-after: avoid; /* Keep header with content */
+            margin-bottom: 20px;
+            border-bottom: 2px solid #2563eb;
+            padding-bottom: 15px;
+            background: white !important;
+            color: #1a1a1a !important;
+            page-break-after: avoid;
+            page-break-inside: avoid;
+          }
+          
+          .print-header::before {
+            display: none !important;
           }
           
           .print-header h1 {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: 700;
             margin: 0 0 8px 0;
-            color: #1e40af;
+            color: #1e40af !important;
             letter-spacing: 0.5px;
+            text-shadow: none !important;
           }
           
           .print-header h2 {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
-            margin: 0 0 15px 0;
-            color: #374151;
+            margin: 0 0 12px 0;
+            color: #374151 !important;
           }
           
           .print-header .meta-info {
-            font-size: 12px;
-            color: #6b7280;
-            margin: 5px 0;
+            font-size: 11px;
+            color: #6b7280 !important;
+            margin: 3px 0;
           }
           
           .summary-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-            margin: 25px 0;
-            page-break-inside: avoid; /* Keep summary boxes together */
+            gap: 10px;
+            margin: 15px 0;
+            page-break-inside: avoid;
+            page-break-after: avoid;
           }
           
           .summary-box {
-            border: 2px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 15px;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            padding: 10px;
             text-align: center;
-            background: #f9fafb;
+            background: #f9fafb !important;
+            page-break-inside: avoid;
           }
           
           .summary-box.total-balance {
             border-color: #3b82f6;
-            background: #eff6ff;
+            background: #eff6ff !important;
           }
           
           .summary-box.net-income {
             border-color: #10b981;
-            background: #ecfdf5;
+            background: #ecfdf5 !important;
           }
           
           .summary-box.total-income {
             border-color: #059669;
-            background: #f0fdf4;
+            background: #f0fdf4 !important;
           }
           
           .summary-box.total-expenses {
             border-color: #dc2626;
-            background: #fef2f2;
+            background: #fef2f2 !important;
+          }
+          
+          .summary-box::before {
+            display: none !important;
           }
           
           .summary-box h3 {
             font-weight: 600;
-            font-size: 11px;
-            margin: 0 0 8px 0;
+            font-size: 9px;
+            margin: 0 0 6px 0;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
           }
           
-          .summary-box.total-balance h3 { color: #1d4ed8; }
-          .summary-box.net-income h3 { color: #047857; }
-          .summary-box.total-income h3 { color: #065f46; }
-          .summary-box.total-expenses h3 { color: #b91c1c; }
+          .summary-box.total-balance h3 { color: #1d4ed8 !important; }
+          .summary-box.net-income h3 { color: #047857 !important; }
+          .summary-box.total-income h3 { color: #065f46 !important; }
+          .summary-box.total-expenses h3 { color: #b91c1c !important; }
           
           .summary-box .amount {
-            font-size: 14px;
+            font-size: 11px;
             font-weight: 700;
             margin: 0;
-            color: #111827;
+            color: #111827 !important;
           }
           
           .transactions-section {
-            margin-top: 30px;
+            margin-top: 20px;
           }
           
           .section-title {
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 600;
-            color: #374151;
-            margin-bottom: 15px;
-            padding: 10px 15px;
-            background: #f3f4f6;
-            border-left: 4px solid #3b82f6;
-            page-break-after: avoid; /* Keep section title with its content */
+            color: #374151 !important;
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            background: #f3f4f6 !important;
+            border-left: 3px solid #3b82f6;
+            page-break-after: avoid;
           }
           
           .transactions-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 10px;
-            margin-top: 10px;
+            font-size: 8px;
+            margin-top: 5px;
+            page-break-inside: auto;
           }
           
           .transactions-table th {
-            background: #f8fafc;
+            background: #f8fafc !important;
             border: 1px solid #d1d5db;
-            padding: 8px 6px;
+            padding: 6px 4px;
             text-align: left;
             font-weight: 600;
-            color: #374151;
-            font-size: 9px;
+            color: #374151 !important;
+            font-size: 7px;
             text-transform: uppercase;
-            letter-spacing: 0.3px;
+            letter-spacing: 0.2px;
           }
           
           .transactions-table thead {
-            display: table-header-group; /* Repeat table header on each page */
+            display: table-header-group;
+          }
+          
+          .transactions-table tbody {
+            display: table-row-group;
           }
           
           .transactions-table tr {
-            page-break-inside: avoid; /* Prevent breaking rows across pages */
+            page-break-inside: avoid;
             page-break-after: auto;
           }
           
           .transactions-table td {
             border: 1px solid #e5e7eb;
-            padding: 6px;
-            font-size: 9px;
-            color: #4b5563;
+            padding: 4px;
+            font-size: 7px;
+            color: #4b5563 !important;
           }
           
           .transactions-table tr:nth-child(even) {
-            background: #f9fafb;
+            background: #f9fafb !important;
           }
           
           .transactions-table .amount-cell {
@@ -220,25 +267,25 @@ export default function StatementOfAccountPrint({
           }
           
           .transactions-table .income-row {
-            border-left: 3px solid #10b981;
+            border-left: 2px solid #10b981;
           }
           
           .transactions-table .expense-row {
-            border-left: 3px solid #ef4444;
+            border-left: 2px solid #ef4444;
           }
           
           .transactions-table .transfer-row {
-            border-left: 3px solid #6366f1;
+            border-left: 2px solid #6366f1;
           }
           
           .print-footer {
             text-align: center;
-            margin-top: 30px;
-            padding-top: 20px;
+            margin-top: 20px;
+            padding-top: 15px;
             border-top: 1px solid #e5e7eb;
-            font-size: 9px;
-            color: #6b7280;
-            page-break-before: avoid; /* Keep footer with content */
+            font-size: 8px;
+            color: #6b7280 !important;
+            page-break-inside: avoid;
           }
           
           .screen-only {
@@ -575,4 +622,3 @@ export default function StatementOfAccountPrint({
     </>
   );
 }
-
