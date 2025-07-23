@@ -205,7 +205,7 @@ const Dashboard = ({ addToast }: DashboardProps) => {
     if (firstName) {
       return `Hi, ${firstName}!`;
     }
-    return 'Welcome to ChurchTrack!';
+    return 'Welcome to CoCKFin!';
   };
 
   const hasUnsyncedData = accounts.some(acc => !acc.is_synced) || 

@@ -44,7 +44,7 @@ export default function UpdatePrompt({ isAppInstalled, newServiceWorker }: Updat
               Update Available
             </h3>
             <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-              A new version of FinTrack is ready to install
+              A new version of CoCKFin is ready to install
             </p>
           </div>
           

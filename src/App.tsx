@@ -162,7 +162,7 @@ function App() {
           {/* Version Footer - Positioned at the end of content */}
           <div className="px-4 sm:px-6 py-3 mb-16 lg:mb-0">
             <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-              ChurchTrack ver. 1.2.0 by{' '}
+              CoCKFin ver. 1.2.0 by{' '}
               <a 
                 href="https://elxis.com.ng" 
                 target="_blank" 

@@ -35,7 +35,7 @@ You can use tools like:
 Or create them manually with your preferred design tool.
 `);
 
-// Basic SVG icon template for FinTrack
+// Basic SVG icon template for CoCKFin
 const iconSVG = `
 <svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
   <defs>

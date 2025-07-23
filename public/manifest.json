@@ -1,7 +1,7 @@
 {
-  "name": "ChurchTrack - Church Financial Management",
-  "short_name": "ChurchTrack",
-  "description": "Church financial management system - Track church finances offline and online with role-based access control",
+  "name": "CoCKFin - Church Financial Management",
+  "short_name": "CoCKFin",
+  "description": "CoCKFin - Church financial management system - Track church finances offline and online with role-based access control",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#1e293b",
@@ -95,14 +95,14 @@
       "sizes": "1280x720",
       "type": "image/png",
       "form_factor": "wide",
-      "label": "FinTrack Dashboard on Desktop"
+      "label": "CoCKFin Dashboard on Desktop"
     },
     {
       "src": "/splash/splash.png",
       "sizes": "390x844",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "FinTrack Mobile Dashboard"
+      "label": "CoCKFin Mobile Dashboard"
     }
   ],
   "prefer_related_applications": false,
@@ -114,7 +114,7 @@
   },
   "protocol_handlers": [
     {
-      "protocol": "web+fintrack",
+      "protocol": "web+cockfin",
       "url": "/?action=%s"
     }
   ]

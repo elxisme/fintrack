@@ -41,7 +41,7 @@ export function exportStatementToExcel(data: StatementData) {
 
   // Prepare header data
   const headerData = [
-    ['CHURCH OF CHRIST, KAGINI'],
+    ['CHURCH OF CHRIST, KAGINI (CoCKFin)'],
     ['STATEMENT OF ACCOUNT'],
     [`Period: ${dateRange.label}`],
     [`Generated on: ${format(new Date(), 'MMMM dd, yyyy')}`],

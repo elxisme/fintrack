@@ -71,7 +71,7 @@ export default function InstallPrompt({ pwaHook }: InstallPromptProps) {
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between mb-2">
               <h3 className="font-bold text-gray-900 dark:text-white text-base">
-                Install FinTrack App
+                Install CoCKFin App
               </h3>
               <button
                 onClick={dismissInstallPrompt}
