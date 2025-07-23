@@ -93,25 +93,221 @@ export default function StatementOfAccountPrint({
     <>
       <style jsx global>{`
         @media print {
-          body * {
-            visibility: hidden;
-          }
-          .print-modal-content, .print-modal-content * {
-            visibility: visible;
-          }
-          .print-modal-content {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-            margin: 0;
-            padding: 20px;
-            background: white;
-          }
-          .no-print {
-            display: none !important;
-          }
-        }
+  /* Reset and base styles */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+  
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+    font-size: 12pt !important;
+    line-height: 1.4 !important;
+  }
+  
+  /* Hide non-print elements */
+  .no-print,
+  .print-button,
+  button {
+    display: none !important;
+  }
+  
+  /* Show only print content */
+  body * {
+    visibility: hidden;
+  }
+  
+  .print-content,
+  .print-content * {
+    visibility: visible !important;
+  }
+  
+  .print-content {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0.5in !important;
+  }
+  
+  /* Page setup */
+  @page {
+    size: A4;
+    margin: 0.5in;
+  }
+  
+  /* Page break utilities */
+  .page-break-before {
+    page-break-before: always !important;
+    break-before: page !important;
+  }
+  
+  .page-break-after {
+    page-break-after: always !important;
+    break-after: page !important;
+  }
+  
+  .page-break-avoid {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+  
+  .page-break-auto {
+    page-break-inside: auto !important;
+    break-inside: auto !important;
+  }
+  
+  /* Header styles */
+  .print-header {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    margin-bottom: 30pt !important;
+    text-align: center !important;
+  }
+  
+  .print-header h1 {
+    font-size: 18pt !important;
+    font-weight: bold !important;
+    margin: 0 0 10pt 0 !important;
+  }
+  
+  .print-header h2 {
+    font-size: 14pt !important;
+    font-weight: bold !important;
+    margin: 0 0 15pt 0 !important;
+  }
+  
+  /* Summary section */
+  .summary-grid {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    margin-bottom: 20pt !important;
+  }
+  
+  .summary-box {
+    border: 2pt solid #000 !important;
+    padding: 10pt !important;
+    margin: 5pt !important;
+    text-align: center !important;
+    background: #f5f5f5 !important;
+  }
+  
+  .summary-box h3 {
+    font-size: 12pt !important;
+    font-weight: bold !important;
+    margin: 0 !important;
+  }
+  
+  /* Table styles */
+  .transactions-section {
+    page-break-before: always !important;
+    break-before: page !important;
+  }
+  
+  .section-title {
+    font-size: 14pt !important;
+    font-weight: bold !important;
+    background: #f0f0f0 !important;
+    padding: 8pt !important;
+    border: 1pt solid #000 !important;
+    margin: 0 0 10pt 0 !important;
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+  }
+  
+  .transactions-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    font-size: 10pt !important;
+    page-break-inside: auto !important;
+    break-inside: auto !important;
+  }
+  
+  .transactions-table thead {
+    display: table-header-group !important;
+  }
+  
+  .transactions-table tbody {
+    display: table-row-group !important;
+  }
+  
+  .transactions-table th,
+  .transactions-table td {
+    border: 1pt solid #000 !important;
+    padding: 4pt !important;
+    text-align: left !important;
+    vertical-align: top !important;
+  }
+  
+  .transactions-table th {
+    background: #e0e0e0 !important;
+    font-weight: bold !important;
+    font-size: 10pt !important;
+  }
+  
+  .transactions-table tr {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+  
+  /* Prevent table from breaking badly */
+  .transactions-table tbody tr:nth-child(20n) {
+    page-break-after: always !important;
+    break-after: page !important;
+  }
+  
+  /* Amount column alignment */
+  .amount-cell {
+    text-align: right !important;
+  }
+  
+  /* Transaction type styling */
+  .income-row {
+    background: #f0f8f0 !important;
+  }
+  
+  .expense-row {
+    background: #f8f0f0 !important;
+  }
+  
+  /* Footer */
+  .print-footer {
+    page-break-before: always !important;
+    break-before: page !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    text-align: center !important;
+    font-size: 10pt !important;
+    color: #666 !important;
+    border-top: 1pt solid #000 !important;
+    padding-top: 10pt !important;
+    margin-top: 20pt !important;
+  }
+  
+  /* Continuation indicators */
+  .page-continuation {
+    text-align: center !important;
+    font-style: italic !important;
+    margin: 10pt 0 !important;
+    font-size: 10pt !important;
+  }
+  
+  /* Prevent orphans and widows */
+  p, div, li {
+    orphans: 3 !important;
+    widows: 3 !important;
+  }
+  
+  /* Override any conflicting styles */
+  .print-content * {
+    max-width: none !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+}
       `}</style>
 
       <div className="print-modal-content max-w-4xl mx-auto p-8 bg-white text-black">
