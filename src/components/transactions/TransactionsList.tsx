@@ -5,10 +5,10 @@ import { format, startOfMonth, endOfMonth, subMonths } from 'date-fns';
 import CreateTransactionModal from './CreateTransactionModal';
 import EditTransactionModal from './EditTransactionModal';
 import ConfirmDialog from '../ui/ConfirmDialog';
-import StatementOfAccountPrint from './StatementOfAccountPrint';
 import { Transaction } from '../../lib/offline-storage';
 import { useAuthStore } from '../../store/auth-store';
 import { exportStatementToExcel } from '../../utils/excelExport';
+import { exportStatementToPDF } from '../../utils/pdfExport';
 
 interface TransactionsListProps {
   addToast: (toast: { type: 'success' | 'error' | 'warning' | 'info'; title: string; message?: string }) => void;
@@ -30,7 +30,6 @@ function TransactionsList({ addToast }: TransactionsListProps) {
   const [customStartDate, setCustomStartDate] = useState(format(startOfMonth(new Date()), 'yyyy-MM-dd'));
   const [customEndDate, setCustomEndDate] = useState(format(endOfMonth(new Date()), 'yyyy-MM-dd'));
   const [showExportOptions, setShowExportOptions] = useState(false);
-  const [showPrintStatement, setShowPrintStatement] = useState(false);
   
   const { transactions, accounts, categories, deleteTransaction, exchangeRate } = useFinanceStore();
   const authStore = useAuthStore();
@@ -197,8 +196,19 @@ function TransactionsList({ addToast }: TransactionsListProps) {
   };
 
   const handlePrintStatement = () => {
-    setShowPrintStatement(true);
+    exportStatementToPDF({
+      transactions: filteredTransactions,
+      accounts,
+      categories,
+      dateRange,
+      exchangeRate
+    });
     setShowExportOptions(false);
+    addToast({
+      type: 'success',
+      title: 'PDF generated',
+      message: 'Statement of Account has been downloaded as PDF'
+    });
   };
 
   // Get unique categories from transactions for filter
@@ -259,8 +269,8 @@ function TransactionsList({ addToast }: TransactionsListProps) {
                   >
                     <FileText className="w-4 h-4" />
                     <div>
-                      <div className="font-medium">Print Statement</div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400">Open printable version</div>
+                      <div className="font-medium">Download PDF</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">Generate PDF statement</div>
                     </div>
                   </button>
                   <button
@@ -595,30 +605,6 @@ function TransactionsList({ addToast }: TransactionsListProps) {
         onConfirm={handleDeleteTransaction}
         onCancel={() => setDeletingTransaction(null)}
       />
-
-      {/* Print Statement Modal */}
-      {showPrintStatement && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl max-w-6xl w-full max-h-[95vh] overflow-y-auto">
-            <div className="flex items-center justify-between p-4 border-b border-gray-200 sticky top-0 bg-white rounded-t-2xl">
-              <h2 className="text-xl font-bold text-gray-900">Statement of Account - {dateRange.label}</h2>
-              <button
-                onClick={() => setShowPrintStatement(false)}
-                className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                ×
-              </button>
-            </div>
-            <StatementOfAccountPrint
-              transactions={filteredTransactions}
-              accounts={accounts}
-              categories={categories}
-              dateRange={dateRange}
-              exchangeRate={exchangeRate}
-            />
-          </div>
-        </div>
-      )}
     </div>
   );
 }
