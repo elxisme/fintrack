@@ -15,6 +15,14 @@ interface StatementData {
 }
 
 export function exportStatementToPDF(data: StatementData) {
+  console.log('=== PDF Export Function Debug ===');
+  console.log('Received data:', data);
+  console.log('Transactions count:', data.transactions.length);
+  console.log('Accounts count:', data.accounts.length);
+  console.log('Categories count:', data.categories.length);
+  console.log('Date range:', data.dateRange);
+  console.log('Exchange rate:', data.exchangeRate);
+  
   const { transactions, accounts, categories, dateRange, exchangeRate } = data;
 
   // Format currency helper
@@ -37,10 +45,21 @@ export function exportStatementToPDF(data: StatementData) {
   const totalExpenses = expenseTransactions.reduce((sum, t) => sum + t.amount, 0);
   const netIncome = totalIncome - totalExpenses;
 
+  console.log('Calculated totals:', {
+    totalBalance,
+    totalIncome,
+    totalExpenses,
+    netIncome,
+    incomeTransactionsCount: incomeTransactions.length,
+    expenseTransactionsCount: expenseTransactions.length
+  });
+
   // Sort transactions by date
   const sortedTransactions = [...transactions].sort((a, b) => 
     new Date(a.date).getTime() - new Date(b.date).getTime()
   );
+  
+  console.log('Sorted transactions for PDF:', sortedTransactions);
 
   // Generate HTML content
   const htmlContent = `

@@ -196,6 +196,23 @@ function TransactionsList({ addToast }: TransactionsListProps) {
   };
 
   const handlePrintStatement = () => {
+    console.log('=== PDF Export Debug ===');
+    console.log('All transactions from store:', transactions);
+    console.log('All accounts from store:', accounts);
+    console.log('All categories from store:', categories);
+    console.log('Date range:', dateRange);
+    console.log('Filtered transactions:', filteredTransactions);
+    console.log('Exchange rate:', exchangeRate);
+    
+    const exportData = {
+      transactions: filteredTransactions,
+      accounts,
+      categories,
+      dateRange,
+      exchangeRate
+    };
+    console.log('Data being passed to PDF export:', exportData);
+    
     exportStatementToPDF({
       transactions: filteredTransactions,
       accounts,
